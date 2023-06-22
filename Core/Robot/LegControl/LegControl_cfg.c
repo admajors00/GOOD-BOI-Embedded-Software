@@ -19,9 +19,9 @@ const float l = 1;
 
 //set to 1 if system is using rtos and 0 if not
 
-#define  s_1  0
-#define  h_1  1
-#define  k_1  2
+#define  s_1  0 //swivel
+#define  h_1  1 //hip
+#define  k_1  2 //knee
 
 #define  s_2  3
 #define  h_2  4

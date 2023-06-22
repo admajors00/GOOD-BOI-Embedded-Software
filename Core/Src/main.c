@@ -487,33 +487,6 @@ int main(void)
 
   while (1)
   {
-
-
-	 // __HAL_TIM_SetCompare(&htim4, TIM_CHANNEL_1, 50+(90*200/270));
-//	  writeLegT1T2T3(L_1, 90, 90, 90);
-//	  writeLegT1T2T3(L_2, 90, 90, 90);
-//	  writeLegT1T2T3(L_3, 90, 90, 90);
-//	  writeLegT1T2T3(L_4, 90, 90 ,90);
-//	  for(float i=0;i<270; i+=.001){
-//		  writeLegT1T2T3(L_3, 90, i, 90);
-//		  writeLegT1T2T3(L_4, 90, i , 90);
-//	  }
-//	  for(float i=270;i>0; i-=.001){
-//	  		  writeLegT1T2T3(L_3, 90, i, 90);
-//	  		  writeLegT1T2T3(L_4, 90, i , 90);
-//	  }
-
-//	  setPosXYZ(L_1, 0,0,-1);
-//	  setPosXYZ(L_2, 0,0,-1);
-//	  setPosXYZ(L_3, 0,0,-1);
-//	  setPosXYZ(L_4, 0,0,-1);
-	 // SERVO_RawMove(11,7525);
-	 // HAL_Delay(100);
-
-//	  LEG_CONT_singleStep_1(L_1, 0, 1);
-//	  LEG_CONT_singleStep_1(L_2, 0, 1);
-//	  LEG_CONT_singleStep_1(L_3, 0, 1);
-//	  LEG_CONT_singleStep_1(L_4, 0, 1);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -1257,38 +1230,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef * hspi){
-//	if (hspi->Instance == ADI_IMU_device1.HSPI.Instance){
-//		HAL_GPIO_WritePin(ADI_IMU_device1.CSPort, ADI_IMU_device1.CSPin, GPIO_PIN_SET);
-//		ADI_IMU_scaleBurstRead();
-//		if(counter >100){
-//			uart_buf_len = sprintf(uart_buf, "%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%0.2f\t%d\t%0.2f\r\n\n\n",
-//					ADI_IMU_burstReadBufScaled[2],
-//					ADI_IMU_burstReadBufScaled[3],
-//					ADI_IMU_burstReadBufScaled[4],
-//					ADI_IMU_burstReadBufScaled[5],
-//					ADI_IMU_burstReadBufScaled[6],
-//					ADI_IMU_burstReadBufScaled[7],
-//					ADI_IMU_burstReadBufScaled[8],
-//					(uint16_t)ADI_IMU_burstReadBufScaled[9],
-//					ADI_IMU_burstReadBufScaled[10]);
-//
-//			HAL_UART_Transmit_IT(&huart3, (uint8_t*) uart_buf, uart_buf_len);
-//			counter = 0;
-//		}else{
-//			counter++;
-//		}
-//		osMutexRelease(accGyroMutexHandle);
-//		ADI_IMU_device1.State = ADI_IMU_READY;
-//		ADI_IMU_device1.HSPI.State = HAL_SPI_STATE_READY;
-//		if(state == STATE_GET_TARGET_ANGLES){
-//			xTargetAngle = atan2(ADI_IMU_burstReadBufScaled[5], ADI_IMU_burstReadBufScaled[7])*180/PI;
-//			yTargetAngle = atan2(ADI_IMU_burstReadBufScaled[6], ADI_IMU_burstReadBufScaled[7])*180/PI;
-//			state = STATE_NORMAL_MODE;
-//
-//		}
-//
-//
-//	}
+
  }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -1299,11 +1241,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			PSC_BUFFER_INDEX=0;
 		}
 		HAL_UART_Receive_IT(&huart2, (uint8_t *)&PSC_INPUT_BUFFER[PSC_BUFFER_INDEX], 1);
-//		HAL_UART_Transmit(&huart2, (uint8_t*)UART2_rxBuffer, 8, 100);
-//		HAL_UART_Transmit(&huart3, (uint8_t*)UART2_rxBuffer, 8, 100);
-//		uart_buf_len = sprintf(uart_buf,"debug\r\n");
-//		HAL_UART_Transmit(&huart3, (uint8_t*) uart_buf, uart_buf_len, 100);
-//		HAL_UART_Receive_IT(&huart2, (uint8_t*) UART2_rxBuffer, 8);
+
 
 	}
 	if(huart == &huart3){
@@ -1316,12 +1254,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
 	char endchar = '>';
 	if(huart == &huart2){
-		//HAL_UART_Transmit(&huart2, (uint8_t*)&endchar, 1, 1);
-//		HAL_UART_Transmit(&huart2, (uint8_t*)UART2_rxBuffer, 8, 100);
-//		HAL_UART_Transmit(&huart3, (uint8_t*)UART2_rxBuffer, 8, 100);
-//		uart_buf_len = sprintf(uart_buf,"debug\r\n");
-//		HAL_UART_Transmit(&huart3, (uint8_t*) uart_buf, uart_buf_len, 100);
-//		HAL_UART_Receive_IT(&huart2, (uint8_t*) UART2_rxBuffer, 8);
 	}
 	if(huart == &huart3){
 		DONE_SENDING = 1;
@@ -1572,32 +1504,6 @@ void StartTask07(void *argument)
   /* Infinite loop */
   for(;;)
   {
-//	  if(state == STATE_NORMAL_MODE){
-//		  if(!LEG_CONT_movingForward){
-//			  if(!L_1.isStepping){
-//				  //LEG_CONT_setPosXYZ(L_1, LEG_CONT_legPositions[L_1.legNum][0]+xOffset, LEG_CONT_legPositions[L_1.legNum][1]-yOffset, LEG_CONT_legPositions[L_1.legNum][2]);
-//				  LEG_CONT_setPosXYZForOffset(L_1, LEG_CONT_legPositions[L_1.legNum][0], LEG_CONT_legPositions[L_1.legNum][1], LEG_CONT_legPositions[L_1.legNum][2], xOffset, -yOffset, 0);
-//			  }
-//			  if(!L_2.isStepping){
-//				  //LEG_CONT_setPosXYZ(L_2, LEG_CONT_legPositions[L_2.legNum][0]+xOffset, LEG_CONT_legPositions[L_2.legNum][1]-yOffset, LEG_CONT_legPositions[L_2.legNum][2]);
-//				  LEG_CONT_setPosXYZForOffset(L_2, LEG_CONT_legPositions[L_2.legNum][0], LEG_CONT_legPositions[L_2.legNum][1], LEG_CONT_legPositions[L_2.legNum][2], xOffset, -yOffset, 0);
-//			  }
-//			  if(!L_3.isStepping){
-//				  //LEG_CONT_setPosXYZ(L_3, LEG_CONT_legPositions[L_3.legNum][0]+xOffset, LEG_CONT_legPositions[L_3.legNum][1]-yOffset, LEG_CONT_legPositions[L_3.legNum][2]);
-//				 LEG_CONT_setPosXYZForOffset(L_3, LEG_CONT_legPositions[L_3.legNum][0], LEG_CONT_legPositions[L_3.legNum][1], LEG_CONT_legPositions[L_3.legNum][2], xOffset, -yOffset, 0);
-//			  }
-//			  if(!L_4.isStepping){
-//				  //LEG_CONT_setPosXYZ(L_4, LEG_CONT_legPositions[L_4.legNum][0]+xOffset, LEG_CONT_legPositions[L_4.legNum][1]-yOffset, LEG_CONT_legPositions[L_4.legNum][2]);
-//				  LEG_CONT_setPosXYZForOffset(L_4, LEG_CONT_legPositions[L_4.legNum][0], LEG_CONT_legPositions[L_4.legNum][1], LEG_CONT_legPositions[L_4.legNum][2], xOffset, -yOffset, 0);
-//			  }
-//		  }
-//	  }
-//	  if(state == STATE_STAND_STILL || state == STATE_WAIT){
-//		  LEG_CONT_setPosXYZ(L_1, -xOffset,-yOffset,1.5);
-//		  LEG_CONT_setPosXYZ(L_2, -xOffset,-yOffset,1.5);
-//		  LEG_CONT_setPosXYZ(L_3, -xOffset,-yOffset,1.5);
-//		  LEG_CONT_setPosXYZ(L_4, -xOffset,-yOffset,1.5);
-//	  }
 		  osDelay(1);
 
   }
