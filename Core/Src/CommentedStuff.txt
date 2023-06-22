@@ -1,0 +1,138 @@
+
+
+
+	//		if(numPrevAnglesToAverage <= yNumPrevAnglesAveraged){
+	//			i = yNumPrevAnglesAveraged%numPrevAnglesToAverage;
+	//			yPrevAngleSum = yPrevAngleSum - yPrevAngles[i] + yCurrentAngle;
+	//			yPrevAnglesAverage = yPrevAngleSum /(float)numPrevAnglesToAverage;
+	//			yPrevAngles[i] = yCurrentAngle;
+	//			yNumPrevAnglesAveraged++;
+	//
+	//		}else{
+	//			yPrevAngles[yNumPrevAnglesAveraged] = yCurrentAngle;
+	//			yPrevAngle = yCurrentAngle;
+//				yPrevAnglesAverage = yCurrentAngle;
+//				yPrevError = yError;
+	//			yPrevAngleSum += yCurrentAngle;
+	//			yNumPrevAnglesAveraged++;
+	//		}
+	//		if(osMutexAcquire(servoAngleMutexHandle, 0) == osOK){
+	//			LEG_CONT_getOffsetsXYZ(L_1, xOffset, yOffset, L_1.Z);
+	//			LEG_CONT_getOffsetsXYZ(L_2, xOffset, yOffset, L_2.Z);
+	//			LEG_CONT_getOffsetsXYZ(L_3, xOffset, yOffset, L_3.Z);
+	//			LEG_CONT_getOffsetsXYZ(L_4, xOffset, yOffset, L_4.Z);
+	//			osMutexRelease(servoAngleMutexHandle);
+	//
+	//		}
+		//}
+		
+=============================================================================================================		
+		
+		//		if(numPrevAnglesToAverage <= xNumPrevAnglesAveraged){
+//			i = xNumPrevAnglesAveraged%numPrevAnglesToAverage;
+//			xPrevAngleSum = xPrevAngleSum - xPrevAngles[i] + xCurrentAngle;
+//			xPrevAnglesAverage = xPrevAngleSum /(float)numPrevAnglesToAverage;
+//			xPrevAngles[i] = xCurrentAngle;
+//			xNumPrevAnglesAveraged++;
+//
+//		}else{
+//			xPrevAngles[xNumPrevAnglesAveraged] = xCurrentAngle;
+//			xPrevAngle = xCurrentAngle;
+//			xPrevAnglesAverage = xCurrentAngle;
+//			xPrevError = xError;
+			//uart_buf_len = sprintf(uart_buf, "%0.5f, %0.5f\r\n", xCurrentAngle, xError);
+			//HAL_UART_Transmit(&huart3, (uint8_t*) uart_buf, uart_buf_len, 100);
+//			xPrevAngleSum += xCurrentAngle;
+//			xNumPrevAnglesAveraged++;
+//		}
+
+
+==========================================================================================================================================
+			//if(counter >=1){
+//				uart_buf_len = sprintf(uart_buf, "%0.5f,%0.5f,%0.5f,%0.5f,%0.5f,%0.5f,%0.5f,%d,%0.5f\r\n",
+//				ADI_IMU_burstReadBufScaled[2],
+//				ADI_IMU_burstReadBufScaled[3],
+//				ADI_IMU_burstReadBufScaled[4],
+//				ADI_IMU_burstReadBufScaled[5],
+//				ADI_IMU_burstReadBufScaled[6],
+//				ADI_IMU_burstReadBufScaled[7],
+//				ADI_IMU_burstReadBufScaled[8],
+//				(uint16_t)ADI_IMU_burstReadBufScaled[9],
+//				ADI_IMU_burstReadBufScaled[10]);
+
+//				HAL_UART_Transmit(&huart3, (uint8_t*) uart_buf, uart_buf_len, 100);
+//				counter = 0;
+//			}else{
+//				counter++;
+//			}
+
+
+//			if(state == STATE_GET_TARGET_ANGLES){
+//				xTargetAngle = atan2(ADI_IMU_burstReadBufScaled[5], ADI_IMU_burstReadBufScaled[7])*180/PI;
+//				yTargetAngle = atan2(ADI_IMU_burstReadBufScaled[6], ADI_IMU_burstReadBufScaled[7])*180/PI;
+//				state = STATE_NORMAL_MODE;
+//
+//			}
+
+
+
+
+==============================================================================================================================================
+update servos thread
+==============================================================================================================================================
+//  float y = stepDist * cos(DEG_TO_RAD * angle);
+//  float x = stepDist * sin(DEG_TO_RAD * angle);
+//	  if(state == STATE_NORMAL_MODE){
+//		  LEG_CONT_singleStep(&L_4, 0, stepDist);
+//		  //LEG_CONT_singleStep_RTOS(&L_1, 0, stepDist, servoAngleMutexHandle);
+//		  osDelay(250);
+//		  LEG_CONT_singleStep(&L_3, 0, stepDist);
+//
+//		  osDelay(250);
+//		  LEG_CONT_singleStep(&L_2, 0, stepDist);
+//		  osDelay(250);
+//		  LEG_CONT_singleStep(&L_1, 0, stepDist);
+//
+//		  osDelay(250);
+//		  LEG_CONT_movingForward = 1;
+//		  for(float y=0; y<.25; y+= step_/4 ){
+//			  LEG_CONT_setPosXYZ(L_1, LEG_CONT_legPositions[L_1.legNum][0], LEG_CONT_legPositions[L_1.legNum][1]-step_, LEG_CONT_legPositions[L_1.legNum][2]);
+//			  LEG_CONT_setPosXYZ(L_2, LEG_CONT_legPositions[L_2.legNum][0], LEG_CONT_legPositions[L_2.legNum][1]-step_, LEG_CONT_legPositions[L_2.legNum][2]);
+//			  LEG_CONT_setPosXYZ(L_3, LEG_CONT_legPositions[L_3.legNum][0], LEG_CONT_legPositions[L_3.legNum][1]-step_, LEG_CONT_legPositions[L_3.legNum][2]);
+//			  LEG_CONT_setPosXYZ(L_4, LEG_CONT_legPositions[L_4.legNum][0], LEG_CONT_legPositions[L_4.legNum][1]-step_, LEG_CONT_legPositions[L_4.legNum][2]);
+//		  }
+//		  LEG_CONT_movingForward = 0;
+//		  osDelay(250);
+//	  }
+//	  if(state == STATE_DIAGONAL_TROTT){
+
+//		  	for (float i = -stepDist; i <= stepDist; i += step_) {
+//		  		LEG_CONT_setPosXYZ(L_1, (i * x), (i * y), f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
+//		  		LEG_CONT_setPosXYZ(L_4, (i * x), (i * y), f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
+//		  		LEG_CONT_setPosXYZ(L_3, (-i * x), (-i * y), f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
+//				LEG_CONT_setPosXYZ(L_2, (-i * x), (-i * y), f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
+//		  	}
+//		  	for (float i = -stepDist; i <= stepDist; i += step_) {
+//				LEG_CONT_setPosXYZ(L_1, (-i * x), (-i * y), f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
+//				LEG_CONT_setPosXYZ(L_4, (-i * x), (-i * y), f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
+//				LEG_CONT_setPosXYZ(L_3, (i * x), (i * y), f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
+//				LEG_CONT_setPosXYZ(L_2, (i * x), (i * y), f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
+//			}
+
+//	  }
+//		  LEG_CONT_singleStep_1(L_1, 0, 1);
+//		  LEG_CONT_singleStep_1(L_2, 0, 1);
+//		  LEG_CONT_singleStep_1(L_3, 0, 1);
+//		  LEG_CONT_singleStep_1(L_4, 0, 1);
+
+//		  for(float i = stepDist; i>-stepDist; i-= step_){
+//			  if(osMutexAcquire(servoAngleMutexHandle, 0) == osOK){
+//
+//				  LEG_CONT_setPosXYZ(L_1, 0, i, -1.);
+//				  LEG_CONT_setPosXYZ(L_2, 0, i, -1.);
+//				  LEG_CONT_setPosXYZ(L_3, 0, i, -1.);
+//				  LEG_CONT_setPosXYZ(L_4, 0, i, -1.);
+//				  osMutexRelease(servoAngleMutexHandle);
+//			  }
+//
+//		  }
