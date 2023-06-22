@@ -41,7 +41,17 @@ float h(float x) {
 }
 
 
-
+void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset){	
+	float pos  = start - (percentage* distance);
+	if(pos1 > distance /8){
+		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,height);
+	}else if(po1 <= distance/8 && pos>0){
+		pos = 8* ((distance /8 )-pos);
+		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,(height/distance)*sqrt(pow(distance,2)- pow(pos-distance,2)));
+	}else if(pos < 0){
+		LEG_CONT_setPosXYZ(leg, xoffest, distance + pos + yoffset,height);
+	}
+}
 void LEG_CONT_singleStep_1(LEG_CONT_Leg leg, float angle, float distance) {
 	float y = distance * cos(DEG_TO_RAD * angle);
 	float x = distance * sin(DEG_TO_RAD * angle);

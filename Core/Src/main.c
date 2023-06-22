@@ -206,7 +206,7 @@ const osEventFlagsAttr_t searialDataReady_attributes = {
 };
 /* USER CODE BEGIN PV */
 
-enum States {cntrlSys, standStill, wait, test1, test2, layDown};
+enum States {cntrlSys, standStill, wait, test1, test2, layDown, walk};
 volatile enum States STATE = standStill;
 enum States testNum = test1;
 int counter = 0;
@@ -1381,26 +1381,49 @@ void StartTask04(void *argument)
   /* Infinite loop */
 	short int temp = 0;
 	float startTime;
+  float time = 0;
+  float max_time = 1000;
+  float distance = .5;
+  float l1_start = distance;
+  float l2_start = distance * 3/4;
+  float l3_start = distance / 2;
+  float l4_start = distance /4; 
+  float pos1 = 0;
+  float pos1A = 0;
+  float height = 1.5;
+  float distance_sqrt = sqrt(distance /2);
+  float percentage = 0;
 
   for(;;){
 	  if(STATE != wait){
+      if(STATE == walk){
+        percentage = time/max_time;
+        LEG_CONT_walkingGait_1(L_1, l1_start, distance, percentage, .5,0);
+        LEG_CONT_walkingGait_1(L_2, l2_start, distance, percentage, -.5,0);
+        LEG_CONT_walkingGait_1(L_3, l3_start, distance, percentage, .5,0);
+        LEG_CONT_walkingGait_1(L_4, l4_start, distance, percentage, -.5,0);
+        time+=1;
+        if(time >= max_time){
+          time = 0;
+        }
+      }
 	  	  if(STATE == cntrlSys){
-			  LEG_CONT_setPosXYZ(L_1, .5-xOffset, -.5-yOffset,1.5);
-			  LEG_CONT_setPosXYZ(L_2, -.5-xOffset, -.5-yOffset,1.5);
-			  LEG_CONT_setPosXYZ(L_3, 0,0,.5);
-			  LEG_CONT_setPosXYZ(L_4, -.5-xOffset,  .5-yOffset,1.5);
+          LEG_CONT_setPosXYZ(L_1, .5-xOffset, -.5-yOffset,1.5);
+          LEG_CONT_setPosXYZ(L_2, -.5-xOffset, -.5-yOffset,1.5);
+          LEG_CONT_setPosXYZ(L_3, 0,0,.5);
+          LEG_CONT_setPosXYZ(L_4, -.5-xOffset,  .5-yOffset,1.5);
 	  	  }
 	  	  if(STATE == standStill){
-	  		  LEG_CONT_setPosXYZ(L_1,  .75, -.75, 1.5);
-			  LEG_CONT_setPosXYZ(L_2, -.75, -.75 ,1.5);
-			  LEG_CONT_setPosXYZ(L_3,  .75,  .75, 1.5);
-			  LEG_CONT_setPosXYZ(L_4, -.75,  .75, 1.5);
+          LEG_CONT_setPosXYZ(L_1,  .75, -.75, 1.5);
+          LEG_CONT_setPosXYZ(L_2, -.75, -.75 ,1.5);
+          LEG_CONT_setPosXYZ(L_3,  .75,  .75, 1.5);
+          LEG_CONT_setPosXYZ(L_4, -.75,  .75, 1.5);
 	  	  }
 	  	  if(STATE == layDown){
 	  		  LEG_CONT_setPosXYZ(L_1,  0, -.5, 0);
-			  LEG_CONT_setPosXYZ(L_2,  0, -.5, 0);
-			  LEG_CONT_setPosXYZ(L_3,  0,  .5, 0);
-			  LEG_CONT_setPosXYZ(L_4,  0,  .5, 0);
+			    LEG_CONT_setPosXYZ(L_2,  0, -.5, 0);
+			    LEG_CONT_setPosXYZ(L_3,  0,  .5, 0);
+			    LEG_CONT_setPosXYZ(L_4,  0,  .5, 0);
 	  	  }
 	  	  if(STATE == test1){
 	  		  if(!temp){
@@ -1425,7 +1448,7 @@ void StartTask04(void *argument)
 	  			  LEG_CONT_setPosXYZ(L_1, .5-xOffset, 	-.5-yOffset,1.5);
 	  			  LEG_CONT_setPosXYZ(L_2, -.5-xOffset, 	-.5-yOffset,1.5);
 	  			  LEG_CONT_setPosXYZ(L_3, .5-xOffset,   0,  i);
-				  LEG_CONT_setPosXYZ(L_4, -.5-xOffset,  .5-yOffset,1.5);
+				    LEG_CONT_setPosXYZ(L_4, -.5-xOffset,  .5-yOffset,1.5);
 				  for(float i=0; i<.24; i+=.001){
 					  LEG_CONT_setPosXYZ(L_3,   0,   0,  i);
 				  }
@@ -1551,6 +1574,13 @@ void StartTask08(void *argument)
 		  }
 		  else if(strncmp(msg.Buf, "Hello There", msg.Idx)==0){
 			  char response[] = "General Kenobi";
+			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
+			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response), 150);
+			  HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);
+
+		  }else if(strncmp(msg.Buf, "Walk", msg.Idx)==0){
+			  char response[] = "walking";
+        STATE = walk;
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response), 150);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);

@@ -68,6 +68,8 @@ float g(float x);
 
 float h(float x);
 
+void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset);
+
 
 /*
  * singleStep moves the foot a specified distance at a certain angle. The path can be described by
