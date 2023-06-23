@@ -1382,8 +1382,8 @@ void StartTask04(void *argument)
 	short int temp = 0;
 	float startTime;
   float time = 0;
-  float max_time = 1000;
-  float distance = .5;
+  float max_time = 10000;
+  float distance = 1;
   float l1_start = distance;
   float l2_start = distance * 3/4;
   float l3_start = distance / 2;
@@ -1398,8 +1398,8 @@ void StartTask04(void *argument)
 	  if(STATE != wait){
       if(STATE == walk){
         percentage = time/max_time;
-        LEG_CONT_walkingGait_1(L_1, l1_start, distance, percentage, .5,0);
-        LEG_CONT_walkingGait_1(L_2, l2_start, distance, percentage, -.5,0);
+        LEG_CONT_walkingGait_1(L_1, l1_start, distance, percentage, .5,-.5);
+        LEG_CONT_walkingGait_1(L_2, l2_start, distance, percentage, -.5,-.5);
         LEG_CONT_walkingGait_1(L_3, l3_start, distance, percentage, .5,0);
         LEG_CONT_walkingGait_1(L_4, l4_start, distance, percentage, -.5,0);
         time+=1;

@@ -11,7 +11,7 @@
 #include "LegControl.h"
 
 const float stepDist = .5;
-const float height = 1.;
+const float height = 1.5;
 const float step_ = .001;
 const float HIP_OFFSET = .28;
 const float angle = 0;
