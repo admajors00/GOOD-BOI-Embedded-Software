@@ -39,6 +39,9 @@ float g(float x) {
 float h(float x) {
 	return -10 * ((x + .3) * (x + .3)) - .85;
 }
+float semi_circle_step(float x, float distance, float height){
+	return(height/distance)*sqrt(pow(distance,2)- pow(x-distance,2));
+}
 
 
 void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset){	
@@ -47,7 +50,7 @@ void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float
 		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,height);
 	}else if(pos <= distance/8 && pos>0){
 		pos = 8* ((distance /8 )-pos);
-		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,(height/distance)*sqrt(pow(distance,2)- pow(pos-distance,2)));
+		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,semi_circle_step(pos,distance, height/2));
 	}else if(pos < 0){
 		LEG_CONT_setPosXYZ(leg, xoffest, distance + pos + yoffset,height);
 	}

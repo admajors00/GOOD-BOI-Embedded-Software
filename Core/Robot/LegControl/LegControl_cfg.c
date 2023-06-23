@@ -10,6 +10,15 @@
 
 #include "LegControl.h"
 
+
+
+volatile float LEG_CONT_g_walkMaxTime = 10000;
+volatile float LEG_CONT_g_walkDistance = 1;
+
+volatile float LEG_CONT_g_walkOpenLoopOffsetX = .25;
+volatile float LEG_CONT_g_walkOpenLoopOffsetY = .5;
+volatile float LEG_CONT_g_walkHeight = 1.5;
+
 const float stepDist = .5;
 const float height = 1.5;
 const float step_ = .001;

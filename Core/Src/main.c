@@ -353,10 +353,10 @@ int main(void)
   HAL_SPI_MspInit(&hspi3);
   LEG_CONT_initServos();
   /////IS_RTOS_USED = 0;
-  LEG_CONT_setPosXYZ(L_1, 0,0,height);
-  LEG_CONT_setPosXYZ(L_2, 0,0,height);
-  LEG_CONT_setPosXYZ(L_3, 0,0,height);
-  LEG_CONT_setPosXYZ(L_4, 0,0,height);
+  LEG_CONT_setPosXYZ(L_1, 0,0,LEG_CONT_g_walkHeight);
+  LEG_CONT_setPosXYZ(L_2, 0,0,LEG_CONT_g_walkHeight);
+  LEG_CONT_setPosXYZ(L_3, 0,0,LEG_CONT_g_walkHeight);
+  LEG_CONT_setPosXYZ(L_4, 0,0,LEG_CONT_g_walkHeight);
 	for(int i=0; i<LEG_CONT_NUM_SERVOS; i++){
 		SERVO_MoveTo(i, LEG_CONT_servoAngles[i]);
 	}
@@ -1382,28 +1382,42 @@ void StartTask04(void *argument)
 	short int temp = 0;
 	float startTime;
   float time = 0;
-  float max_time = 10000;
-  float distance = 1;
-  float l1_start = distance;
-  float l2_start = distance * 3/4;
-  float l3_start = distance / 2;
-  float l4_start = distance /4; 
-  float pos1 = 0;
-  float pos1A = 0;
-  float height = 1.5;
-  float distance_sqrt = sqrt(distance /2);
+
+
+  float l1_start = LEG_CONT_g_walkDistance;
+  float l2_start = LEG_CONT_g_walkDistance * 3/4;
+  float l3_start = LEG_CONT_g_walkDistance / 2;
+  float l4_start = LEG_CONT_g_walkDistance /4; 
+  float open_cont_x_pos =0;
+  float open_cont_y_pos = 0;
   float percentage = 0;
 
   for(;;){
 	  if(STATE != wait){
       if(STATE == walk){
-        percentage = time/max_time;
-        LEG_CONT_walkingGait_1(L_1, l1_start, distance, percentage, .5,-.5);
-        LEG_CONT_walkingGait_1(L_2, l2_start, distance, percentage, -.5,-.5);
-        LEG_CONT_walkingGait_1(L_3, l3_start, distance, percentage, .5,0);
-        LEG_CONT_walkingGait_1(L_4, l4_start, distance, percentage, -.5,0);
+        percentage = time/LEG_CONT_g_walkMaxTime;
+        if(percentage <= .25){ //(+x,-y)->(-x,-y)
+          open_cont_y_pos = -LEG_CONT_g_walkOpenLoopOffsetY/2;
+          open_cont_x_pos = LEG_CONT_g_walkOpenLoopOffsetX/2 - (4*percentage * LEG_CONT_g_walkOpenLoopOffsetX );
+        }
+        if(percentage > .25 && percentage <= .5){ //(-x,-y)->(-x,+y)-
+          open_cont_y_pos = -LEG_CONT_g_walkOpenLoopOffsetY/2 + (4*(percentage-.25) * LEG_CONT_g_walkOpenLoopOffsetY );
+          open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2;
+        }
+        if(percentage > .5 && percentage <= .75){ //(-x,+y)->(+x,+y)
+          open_cont_y_pos = LEG_CONT_g_walkOpenLoopOffsetY/2;
+          open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2 + (4*(percentage-.5) * LEG_CONT_g_walkOpenLoopOffsetX );
+        }
+        if(percentage > .75 && percentage <= 1){ //(+x,+y)->(+x,-y)
+          open_cont_y_pos = LEG_CONT_g_walkOpenLoopOffsetY/2 - (4*(percentage-.75) * LEG_CONT_g_walkOpenLoopOffsetY );
+          open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2;
+        }
+        LEG_CONT_walkingGait_1(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.5-open_cont_y_pos);
+        LEG_CONT_walkingGait_1(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.5-open_cont_y_pos);
+        LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  0-open_cont_y_pos);
+        LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  0-open_cont_y_pos);
         time+=1;
-        if(time >= max_time){
+        if(time >= LEG_CONT_g_walkMaxTime){
           time = 0;
         }
       }
