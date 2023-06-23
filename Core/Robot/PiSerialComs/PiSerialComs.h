@@ -8,6 +8,8 @@
 #ifndef ROBOT_PISERIALCOMS_PISERIALCOMS_H_
 #define ROBOT_PISERIALCOMS_PISERIALCOMS_H_
 #include <stdio.h>
+#include <stdlib.h>
+#include "../Robot/LegControl/LegControl_cfg.h"
 #define PSC_BUFFER_SIZE 32
 #define PSC_START_CHAR 60
 #define PSC_END_CHAR 62
@@ -27,6 +29,7 @@ extern volatile int PSC_NEW_DATA_FROM_BOARD;
 
 int PSC_checkBuffer();
 void PSC_clearBuffer();
+int PSC_InterpretCommand(char msg[], int size)
 //void PSC_checkSerial(int fd);
 
 #endif /* ROBOT_PISERIALCOMS_PISERIALCOMS_H_ */
