@@ -1636,7 +1636,7 @@ void StartTask08(void *argument)
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response),150);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);
-		  }else if(PSC_InterpretCommand(msg.buf, msg.Idx)){
+		  }else if(PSC_InterpretCommand(msg.Buf, msg.Idx)){
         char response[] = "cmd recieved";
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response),150);

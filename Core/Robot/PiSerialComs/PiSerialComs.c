@@ -48,11 +48,11 @@ void PSC_clearBuffer(){
 int PSC_InterpretCommand(char msg[], int size){
 	char param[10];
 	char value[10];
-	char endptr*;
+	char *endptr;
 	float floatValue=0;
-	int i=0;
-	int j=0;
-	int k=0;
+	unsigned int i=0;
+	unsigned int j=0;
+	unsigned int k=0;
 	for(i=0; i<size; i++){
 		if(msg[i] == ','){
 			break;		
@@ -66,7 +66,7 @@ int PSC_InterpretCommand(char msg[], int size){
 				for(k=j; k<size; k++){					
 					value[k-j] = msg[k];
 				}
-				floatValue = strfof(value, &endptr);
+				floatValue = strtof(value, &endptr);
 				if(*endptr != '\0'){
 					return 0;
 				}
@@ -90,9 +90,10 @@ int PSC_InterpretCommand(char msg[], int size){
 		}if(strncmp(param, "DIR", j-i)){
 			LEG_CONT_g_walkDirection = floatValue;
 		}
+
 	}else{
 		return 0;
 	}
-
+	return 0;
 }
 

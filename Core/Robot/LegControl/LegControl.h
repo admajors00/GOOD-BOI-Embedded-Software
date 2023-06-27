@@ -33,7 +33,7 @@ This file controls the legs in 3 dimensions
 #define ROBOT_LEGCONTROL_LEGCONTROL_H_
 //ss#include "LegControl.h"
 //#include "LegControl_cfg.h"
-
+#include "../Robot/Vectors.h"
 
 #define NUM_LEGS 4
 #define LEG_CONT_NUM_SERVOS 12
@@ -70,9 +70,10 @@ float g(float x);
 
 float h(float x);
 
-float semi_circle_step(float x, float distance, float height)
+float semi_circle_step(float x, float distance, float height);
 
 void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset);
+void LEG_CONT_walkingGait_2(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset, float angle);
 
 
 /*

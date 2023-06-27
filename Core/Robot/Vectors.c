@@ -28,5 +28,5 @@ VECT_3D VECT_Cros3D(VECT_3D v1, VECT_3D v2){
     return v3;
 }
 float VECT_Mag3D(VECT_3D v){
-    return sqrt(pow(v.x,2)+pow(v.y,2)+pow(v.z,2))
+    return sqrt(pow(v.x,2)+pow(v.y,2)+pow(v.z,2));
 }

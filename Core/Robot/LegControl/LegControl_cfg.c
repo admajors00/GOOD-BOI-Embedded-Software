@@ -170,10 +170,10 @@ float path[][2] = {
 //		  s_4, h_4, k_4, 0, 1, 0, 0, 0
 //		},
 //};
-Vect3D L_1_startPos;
-Vect3D L_2_startPos;
-Vect3D L_3_startPos;
-Vect3D L_4_startPos;
+VECT_3D L_1_startPos;
+VECT_3D L_2_startPos;
+VECT_3D L_3_startPos;
+VECT_3D L_4_startPos;
 
 
 
