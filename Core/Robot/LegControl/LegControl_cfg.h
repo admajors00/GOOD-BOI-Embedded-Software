@@ -19,6 +19,7 @@ extern volatile float LEG_CONT_g_walkDistance;
 extern volatile float LEG_CONT_g_walkOpenLoopOffsetX;
 extern volatile float LEG_CONT_g_walkOpenLoopOffsetY;
 extern volatile float LEG_CONT_g_walkHeight;
+extern volatile float LEG_CONT_g_walkDirection;
 
 
 
