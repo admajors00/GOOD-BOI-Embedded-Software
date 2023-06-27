@@ -47,12 +47,26 @@ float semi_circle_step(float x, float distance, float height){
 void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset){	
 	float pos  = start - (percentage* distance);
 	if(pos > distance /8){
-		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,height);
+		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,LEG_CONT_g_walkHeight);
 	}else if(pos <= distance/8 && pos>0){
 		pos = 8* ((distance /8 )-pos);
-		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,semi_circle_step(pos,distance, height/2));
+		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
 	}else if(pos < 0){
-		LEG_CONT_setPosXYZ(leg, xoffest, distance + pos + yoffset,height);
+		LEG_CONT_setPosXYZ(leg, xoffest, distance + pos + yoffset,LEG_CONT_g_walkHeight);
+	}
+}
+
+void LEG_CONT_walkingGait_2(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset, float angle){
+	float pos  = start - (percentage* distance);
+	float posy = pos * cos(DEG_TO_RAD * angle);
+	float posx = pos * sin(DEG_TO_RAD * angle);
+	if(pos > distance /8){
+		LEG_CONT_setPosXYZ(leg,posx+ xoffest, posy + yoffset ,LEG_CONT_g_walkHeight);
+	}else if(pos <= distance/8 && pos>0){
+		pos = 8* ((distance /8 )-pos);
+		LEG_CONT_setPosXYZ(leg, posx +xoffest, posy + yoffset , semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
+	}else if(pos < 0){
+		LEG_CONT_setPosXYZ(leg,distance +posx+ xoffest, distance + posy + yoffset,LEG_CONT_g_walkHeight);
 	}
 }
 void LEG_CONT_singleStep_1(LEG_CONT_Leg leg, float angle, float distance) {

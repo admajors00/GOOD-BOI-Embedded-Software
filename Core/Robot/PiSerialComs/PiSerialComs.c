@@ -87,6 +87,8 @@ int PSC_InterpretCommand(char msg[], int size){
 			LEG_CONT_g_walkOpenLoopOffsetX = floatValue;
 		}if(strncmp(param, "OPLOY", j-i)){
 			LEG_CONT_g_walkOpenLoopOffsetY = floatValue;
+		}if(strncmp(param, "DIR", j-i)){
+			LEG_CONT_g_walkDirection = floatValue;
 		}
 	}else{
 		return 0;

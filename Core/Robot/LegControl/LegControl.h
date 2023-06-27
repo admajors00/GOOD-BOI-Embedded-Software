@@ -54,6 +54,8 @@ typedef struct{
   int s_cal; //calibration values for each motor in degrees
   int h_cal;
   int k_cal;
+  VECT_3D pos;
+  VECT_3D startPos;
   volatile int isStepping; //o if not taking a step and 1 if it is
 
 }LEG_CONT_Leg;

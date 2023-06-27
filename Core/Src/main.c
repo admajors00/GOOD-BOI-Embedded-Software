@@ -206,7 +206,7 @@ const osEventFlagsAttr_t searialDataReady_attributes = {
 };
 /* USER CODE BEGIN PV */
 
-enum States {cntrlSys, standStill, wait, test1, test2, layDown, walk};
+enum States {cntrlSys, standStill, wait, test1, test2, layDown, walk,walkdir};
 volatile enum States STATE = standStill;
 enum States testNum = test1;
 int counter = 0;
@@ -1394,28 +1394,35 @@ void StartTask04(void *argument)
 
   for(;;){
 	  if(STATE != wait){
-      if(STATE == walk){
+      if(STATE == walk || STATE == walkdir){
         percentage = time/LEG_CONT_g_walkMaxTime;
         if(percentage <= .25){ //(+x,-y)->(-x,-y)
           open_cont_y_pos = -LEG_CONT_g_walkOpenLoopOffsetY/2;
           open_cont_x_pos = LEG_CONT_g_walkOpenLoopOffsetX/2 - (4*percentage * LEG_CONT_g_walkOpenLoopOffsetX );
         }
-        if(percentage > .25 && percentage <= .5){ //(-x,-y)->(-x,+y)-
+        else if(percentage > .25 && percentage <= .5){ //(-x,-y)->(-x,+y)-
           open_cont_y_pos = -LEG_CONT_g_walkOpenLoopOffsetY/2 + (4*(percentage-.25) * LEG_CONT_g_walkOpenLoopOffsetY );
           open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2;
         }
-        if(percentage > .5 && percentage <= .75){ //(-x,+y)->(+x,+y)
+        else if(percentage > .5 && percentage <= .75){ //(-x,+y)->(+x,+y)
           open_cont_y_pos = LEG_CONT_g_walkOpenLoopOffsetY/2;
           open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2 + (4*(percentage-.5) * LEG_CONT_g_walkOpenLoopOffsetX );
         }
-        if(percentage > .75 && percentage <= 1){ //(+x,+y)->(+x,-y)
+        else if(percentage > .75 && percentage <= 1){ //(+x,+y)->(+x,-y)
           open_cont_y_pos = LEG_CONT_g_walkOpenLoopOffsetY/2 - (4*(percentage-.75) * LEG_CONT_g_walkOpenLoopOffsetY );
           open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2;
         }
-        LEG_CONT_walkingGait_1(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.5-open_cont_y_pos);
-        LEG_CONT_walkingGait_1(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.5-open_cont_y_pos);
-        LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  0-open_cont_y_pos);
-        LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  0-open_cont_y_pos);
+        if(STATE == walk){
+			LEG_CONT_walkingGait_1(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.5-open_cont_y_pos);
+			LEG_CONT_walkingGait_1(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.5-open_cont_y_pos);
+			LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  0-open_cont_y_pos);
+			LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  0-open_cont_y_pos);
+        }else {
+        	LEG_CONT_walkingGait_2(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.5-open_cont_y_pos, LEG_CONT_g_walkDirection);
+			LEG_CONT_walkingGait_2(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.5-open_cont_y_pos, LEG_CONT_g_walkDirection);
+			LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  0-open_cont_y_pos);
+			LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  0-open_cont_y_pos);
+        }
         time+=1;
         if(time >= LEG_CONT_g_walkMaxTime){
           time = 0;
@@ -1587,10 +1594,10 @@ void StartTask08(void *argument)
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);
 		  }
 		  else if(strncmp(msg.Buf, "Hello There", msg.Idx)==0){
-			  char response[] = "General Kenobi";
-			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
-			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response), 150);
-			  HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);
+			  char response[] = "<General Kenobi>";
+			 // HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
+			  HAL_UART_Transmit_IT(&huart2, (uint8_t*)&response, sizeof(response));
+			 // HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);
 
 		  }else if(strncmp(msg.Buf, "Walk", msg.Idx)==0){
 			  char response[] = "walking";
@@ -1599,7 +1606,8 @@ void StartTask08(void *argument)
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response), 150);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);
 
-		  } else if(strncmp(msg.Buf, "imuDataRqst", msg.Idx)==0){
+		  }
+       else if(strncmp(msg.Buf, "imuDataRqst", msg.Idx)==0){
 			  char response[100];
 			  messageLen = sprintf(response, "<%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,>",
 			  					ADI_IMU_burstReadBufScaled[2],
@@ -1611,7 +1619,7 @@ void StartTask08(void *argument)
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, messageLen, 1000);
 
 		  }else if(strncmp(msg.Buf, "performTest", msg.Idx)==0){
-			  STATE = test1;
+			  STATE = cntrlSys;
 			  char response[] = "testing";
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response),150);
