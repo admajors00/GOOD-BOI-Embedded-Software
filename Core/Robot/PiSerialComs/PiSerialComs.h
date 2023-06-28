@@ -29,7 +29,7 @@ extern volatile int PSC_NEW_DATA_FROM_BOARD;
 
 int PSC_checkBuffer();
 void PSC_clearBuffer();
-int PSC_InterpretCommand(char msg[], int size)
+int PSC_InterpretCommand(char msg[], int size);
 //void PSC_checkSerial(int fd);
 
 #endif /* ROBOT_PISERIALCOMS_PISERIALCOMS_H_ */

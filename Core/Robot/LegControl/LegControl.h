@@ -68,7 +68,7 @@ float g(float x);
 
 float h(float x);
 
-float semi_circle_step(float x, float distance, float height)
+float semi_circle_step(float x, float distance, float height);
 
 void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset);
 

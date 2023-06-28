@@ -1384,18 +1384,23 @@ void StartTask04(void *argument)
   float time = 0;
 
 
-  float l1_start = LEG_CONT_g_walkDistance;
-  float l2_start = LEG_CONT_g_walkDistance * 3/4;
-  float l3_start = LEG_CONT_g_walkDistance / 2;
-  float l4_start = LEG_CONT_g_walkDistance /4; 
+  float l1_start = LEG_CONT_g_walkDistance/2;
+  float l2_start = LEG_CONT_g_walkDistance *3/4;
+  float l3_start = LEG_CONT_g_walkDistance/ 4;
+  float l4_start = LEG_CONT_g_walkDistance;
   float open_cont_x_pos =0;
   float open_cont_y_pos = 0;
   float percentage = 0;
+  float openloopOffset =percentage +.125;
 
   for(;;){
 	  if(STATE != wait){
       if(STATE == walk){
         percentage = time/LEG_CONT_g_walkMaxTime;
+        openloopOffset =percentage +.125;
+        if( openloopOffset >=1 ){
+        	openloopOffset -=1;
+        }
         if(percentage <= .25){ //(+x,-y)->(-x,-y)
           open_cont_y_pos = -LEG_CONT_g_walkOpenLoopOffsetY/2;
           open_cont_x_pos = LEG_CONT_g_walkOpenLoopOffsetX/2 - (4*percentage * LEG_CONT_g_walkOpenLoopOffsetX );
@@ -1410,12 +1415,12 @@ void StartTask04(void *argument)
         }
         if(percentage > .75 && percentage <= 1){ //(+x,+y)->(+x,-y)
           open_cont_y_pos = LEG_CONT_g_walkOpenLoopOffsetY/2 - (4*(percentage-.75) * LEG_CONT_g_walkOpenLoopOffsetY );
-          open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2;
+          open_cont_x_pos = LEG_CONT_g_walkOpenLoopOffsetX/2;
         }
-        LEG_CONT_walkingGait_1(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.5-open_cont_y_pos);
-        LEG_CONT_walkingGait_1(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.5-open_cont_y_pos);
-        LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  0-open_cont_y_pos);
-        LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  0-open_cont_y_pos);
+        LEG_CONT_walkingGait_1(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.95-open_cont_y_pos);
+        LEG_CONT_walkingGait_1(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.95-open_cont_y_pos);
+        LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.4-open_cont_y_pos);
+        LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.4-open_cont_y_pos);
         time+=1;
         if(time >= LEG_CONT_g_walkMaxTime){
           time = 0;
@@ -1594,7 +1599,7 @@ void StartTask08(void *argument)
 
 		  }else if(strncmp(msg.Buf, "Walk", msg.Idx)==0){
 			  char response[] = "walking";
-        STATE = walk;
+			  STATE = walk;
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response), 150);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);
@@ -1628,7 +1633,7 @@ void StartTask08(void *argument)
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response),150);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);
-		  }else if(PSC_InterpretCommand(msg.buf, msg.Idx)){
+		  }else if(PSC_InterpretCommand(msg.Buf, msg.Idx)){
         char response[] = "cmd recieved";
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
 			  HAL_UART_Transmit(&huart2, (uint8_t*)&response, sizeof(response),150);
