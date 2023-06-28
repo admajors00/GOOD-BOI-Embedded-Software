@@ -54,7 +54,7 @@ void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float
 	}else if(pos <= distance/8 && pos>0){
 		pos = 8* ((distance /8 )-pos);
 		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
-
+	}
 }
 
 void LEG_CONT_walkingGait_2(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset, float angle){
