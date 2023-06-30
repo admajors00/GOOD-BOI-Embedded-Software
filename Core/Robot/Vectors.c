@@ -30,3 +30,10 @@ VECT_3D VECT_Cros3D(VECT_3D v1, VECT_3D v2){
 float VECT_Mag3D(VECT_3D v){
     return sqrt(pow(v.x,2)+pow(v.y,2)+pow(v.z,2));
 }
+
+float VECT_AngleXY(VECT_3D p1, VECT_3D p2){
+	return atan2(p1.y-p2.y,p1.x-p2.x);
+}
+float VECT_DistXY(VECT_3D p1, VECT_3D p2){
+	return sqrt(pow(p1.x-p2.x,2) + pow(p1.y-p2.y, 2));
+}

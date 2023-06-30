@@ -9,7 +9,7 @@
 
 
 #include "LegControl.h"
-
+#include "../Robot/Vectors.h"
 
 
 volatile float LEG_CONT_g_walkMaxTime = 10000;
@@ -19,6 +19,21 @@ volatile float LEG_CONT_g_walkOpenLoopOffsetX = .25;
 volatile float LEG_CONT_g_walkOpenLoopOffsetY = .5;
 volatile float LEG_CONT_g_walkHeight = 1.5;
 volatile float LEG_CONT_g_walkDirection = 0;
+
+//(+x,-y)->(-x,-y)
+//(-x,-y)->(-x,+y)
+//(-x,+y)->(+x,+y)
+//(+x,+y)->(+x,-y)
+volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset1 = { .5, -.5, 0};
+volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset2 = {-.5, -.5, 0};
+volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset3 = {-.5,  .5, 0};
+volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset4 = { .5,  .5, 0};
+
+volatile VECT_3D LEG_CONT_g_walkStartOffset1 = { .5, -.5, 0};
+volatile VECT_3D LEG_CONT_g_walkStartOffset2 = {-.5, -.5, 0};
+volatile VECT_3D LEG_CONT_g_walkStartOffset3 = {.5,  0, 0};
+volatile VECT_3D LEG_CONT_g_walkStartOffset4 = { -.5,  0, 0};
+
 
 const float stepDist = .5;
 const float height = 1.5;

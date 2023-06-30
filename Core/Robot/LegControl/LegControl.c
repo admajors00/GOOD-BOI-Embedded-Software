@@ -42,35 +42,49 @@ float h(float x) {
 float semi_circle_step(float x, float distance, float height){
 	return(height/distance)*sqrt(pow(distance,2)- pow(x-distance,2));
 }
-
-
-void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset){	
+//start = .5 , distance  = 1
+//percentage * distance  = .6
+//pos = -1.1
+//1/8 distance -> 0
+// 0*distance  = distance
+void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, VECT_3D offset){
 	float pos  = start - (percentage* distance);
-	if(pos < 0){
+	if(pos <0){
 		pos += distance;
 	}
 	if(pos > distance /8){
-		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,LEG_CONT_g_walkHeight);
-	}else if(pos <= distance/8 && pos>0){
+		LEG_CONT_setPosXYZ(leg, offset.x, pos + offset.y ,LEG_CONT_g_walkHeight);
+	}else if(pos <= distance/8 && pos>=0){
 		pos = 8* ((distance /8 )-pos);
-		LEG_CONT_setPosXYZ(leg, xoffest, pos + yoffset ,semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
+		LEG_CONT_setPosXYZ(leg, offset.x, pos + offset.y ,semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
 	}
 }
 
-void LEG_CONT_walkingGait_2(LEG_CONT_Leg leg, float start, float distance, float percentage, float xoffest, float yoffset, float angle){
+void LEG_CONT_walkingGait_2(LEG_CONT_Leg leg, float start, float distance, float percentage, VECT_3D offset, float angle){
 	float pos  = start - (percentage* distance);
 	float posy = pos * cos(DEG_TO_RAD * angle);
 	float posx = pos * sin(DEG_TO_RAD * angle);
 	if(pos > distance /8){
-		LEG_CONT_setPosXYZ(leg,posx+ xoffest, posy + yoffset ,LEG_CONT_g_walkHeight);
+		LEG_CONT_setPosXYZ(leg,posx+ offset.x, posy + offset.y ,LEG_CONT_g_walkHeight);
 	}else if(pos <= distance/8 && pos>0){
 		pos = 8* ((distance /8 )-pos);
-		LEG_CONT_setPosXYZ(leg, posx +xoffest, posy + yoffset , semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
+		LEG_CONT_setPosXYZ(leg, posx +offset.x, posy + offset.y, semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
 	}else if(pos < 0){
-		LEG_CONT_setPosXYZ(leg,distance +posx+ xoffest, distance + posy + yoffset,LEG_CONT_g_walkHeight);
+		LEG_CONT_setPosXYZ(leg,distance +posx+ offset.x, distance + posy + offset.y,LEG_CONT_g_walkHeight);
 
 	}
 }
+
+VECT_3D LEG_CONT_Point2Point(VECT_3D p1, VECT_3D p2, float percent){
+	VECT_3D pos;
+	float angle = atan2(p1.y-p2.y,p1.x-p2.x);
+	float distance = sqrt(pow(p1.x-p2.x,2) + pow(p1.y-p2.y, 2));
+	pos.y = percent * distance * cos(angle);
+	pos.x = percent* distance * sin(angle);
+	pos.z = 0;
+	return pos;
+}
+
 void LEG_CONT_singleStep_1(LEG_CONT_Leg leg, float angle, float distance) {
 	float y = distance * cos(DEG_TO_RAD * angle);
 	float x = distance * sin(DEG_TO_RAD * angle);

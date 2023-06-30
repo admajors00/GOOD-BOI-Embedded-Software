@@ -9,6 +9,7 @@
 #define ROBOT_LEGCONTROL_LEGCONTROL_CFG_H_
 
 #include "LegControl.h"
+#include "../Robot/Vectors.h"
 
 #define LEG_CONT_NUM_SERVOS 12
 #define IS_RTOS_USED  1
@@ -22,6 +23,15 @@ extern volatile float LEG_CONT_g_walkHeight;
 extern volatile float LEG_CONT_g_walkDirection;
 
 
+extern volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset1 ;
+extern volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset2 ;
+extern volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset3;
+extern volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset4;
+
+extern volatile VECT_3D LEG_CONT_g_walkStartOffset1;
+extern volatile VECT_3D LEG_CONT_g_walkStartOffset2;
+extern volatile VECT_3D LEG_CONT_g_walkStartOffset3;
+extern volatile VECT_3D LEG_CONT_g_walkStartOffset4;
 
 
 extern const float stepDist;

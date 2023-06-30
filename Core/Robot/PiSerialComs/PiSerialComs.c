@@ -4,6 +4,24 @@
  *  Created on: Sep 12, 2021
  *      Author: Troll
  */
+
+
+/*
+ * List of commands
+ * Messaging structure
+ * Action,Parameter, <V1,V2,V3>
+ *
+ * Actions:
+ * 		Get
+ * 		Set
+ *
+ * 	Parameters:
+ * 		SPEED
+ * 		DIST
+ * 		HEIGHT
+ * 		DIR
+ * 		OPLOn	|	Openloop offset values x y
+ */
 #include "PiSerialComs.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +33,10 @@ int PSC_BUFFER_INDEX = 0;
 int PSC_MSG_LEN = 0;
 
 volatile int PSC_NEW_DATA_FROM_BOARD = 0;
+
+
+
+
 
 int PSC_checkBuffer() {
 	for (int i = 0; i < PSC_BUFFER_INDEX; i++) {
@@ -119,4 +141,5 @@ int PSC_InterpretCommand(char msg[], int size) {
 	}
 	return 0;
 }
+
 

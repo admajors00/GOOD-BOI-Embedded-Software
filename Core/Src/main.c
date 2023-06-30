@@ -128,25 +128,11 @@ const osThreadAttr_t readADI_IMU_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityRealtime7,
 };
-/* Definitions for applyServoOffse */
-osThreadId_t applyServoOffseHandle;
-const osThreadAttr_t applyServoOffse_attributes = {
-  .name = "applyServoOffse",
-  .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
 /* Definitions for piComms */
 osThreadId_t piCommsHandle;
 const osThreadAttr_t piComms_attributes = {
   .name = "piComms",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityRealtime7,
-};
-/* Definitions for checkBuffer */
-osThreadId_t checkBufferHandle;
-const osThreadAttr_t checkBuffer_attributes = {
-  .name = "checkBuffer",
-  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityRealtime7,
 };
 /* Definitions for serialMessages_Queue */
@@ -290,9 +276,7 @@ void StartTask03(void *argument);
 void StartTask04(void *argument);
 void StartTask05(void *argument);
 void StartTask06(void *argument);
-void StartTask07(void *argument);
 void StartTask08(void *argument);
-void StartTask09(void *argument);
 
 /* USER CODE BEGIN PFP */
 //void DMATransferComplete(DMA_HandleTypeDef hdma);
@@ -439,14 +423,8 @@ int main(void)
   /* creation of readADI_IMU */
   readADI_IMUHandle = osThreadNew(StartTask06, NULL, &readADI_IMU_attributes);
 
-  /* creation of applyServoOffse */
-  applyServoOffseHandle = osThreadNew(StartTask07, NULL, &applyServoOffse_attributes);
-
   /* creation of piComms */
   piCommsHandle = osThreadNew(StartTask08, NULL, &piComms_attributes);
-
-  /* creation of checkBuffer */
-  checkBufferHandle = osThreadNew(StartTask09, NULL, &checkBuffer_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -480,7 +458,6 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
-
   /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -1051,6 +1028,8 @@ static void MX_DMA_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOE_CLK_ENABLE();
@@ -1163,6 +1142,8 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -1382,52 +1363,46 @@ void StartTask04(void *argument)
 	short int temp = 0;
 	float startTime;
   float time = 0;
-
+  VECT_3D openLoopOffset = {0,0,0};
 
   float l1_start = LEG_CONT_g_walkDistance/2;
   float l2_start = LEG_CONT_g_walkDistance *3/4;
   float l3_start = LEG_CONT_g_walkDistance/ 4;
   float l4_start = LEG_CONT_g_walkDistance;
-  float open_cont_x_pos =0;
-  float open_cont_y_pos = 0;
   float percentage = 0;
-  float openloopOffset =percentage +.125;
+  float openloopOffsetPerc = percentage +.125;
 
   for(;;){
 	  if(STATE != wait){
       if(STATE == walk || STATE == walkdir){
         percentage = time/LEG_CONT_g_walkMaxTime;
-        openloopOffset =percentage +.125;
-        if( openloopOffset >=1 ){
-        	openloopOffset -=1;
+        openloopOffsetPerc =percentage +.125;
+        if( openloopOffsetPerc >=1 ){
+        	openloopOffsetPerc -=1;
         }
-        if(percentage <= .25){ //(+x,-y)->(-x,-y)
-          open_cont_y_pos = -LEG_CONT_g_walkOpenLoopOffsetY/2;
-          open_cont_x_pos = LEG_CONT_g_walkOpenLoopOffsetX/2 - (4*percentage * LEG_CONT_g_walkOpenLoopOffsetX );
+        if(openloopOffsetPerc <= .25){ //(+x,-y)->(-x,-y)
+        	openLoopOffset = LEG_CONT_Point2Point(LEG_CONT_g_walkOpenLoopOffset1, LEG_CONT_g_walkOpenLoopOffset2, 4*openloopOffsetPerc);
         }
-        else if(percentage > .25 && percentage <= .5){ //(-x,-y)->(-x,+y)-
-          open_cont_y_pos = -LEG_CONT_g_walkOpenLoopOffsetY/2 + (4*(percentage-.25) * LEG_CONT_g_walkOpenLoopOffsetY );
-          open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2;
+        else if(openloopOffsetPerc > .25 && openloopOffsetPerc <= .5){ //(-x,-y)->(-x,+y)-
+        	openLoopOffset = LEG_CONT_Point2Point(LEG_CONT_g_walkOpenLoopOffset2, LEG_CONT_g_walkOpenLoopOffset3, 4*(openloopOffsetPerc-.25));
         }
-        else if(percentage > .5 && percentage <= .75){ //(-x,+y)->(+x,+y)
-          open_cont_y_pos = LEG_CONT_g_walkOpenLoopOffsetY/2;
-          open_cont_x_pos = -LEG_CONT_g_walkOpenLoopOffsetX/2 + (4*(percentage-.5) * LEG_CONT_g_walkOpenLoopOffsetX );
+        else if(openloopOffsetPerc > .5 && openloopOffsetPerc <= .75){ //(-x,+y)->(+x,+y)
+        	openLoopOffset = LEG_CONT_Point2Point(LEG_CONT_g_walkOpenLoopOffset3, LEG_CONT_g_walkOpenLoopOffset4, 4*(openloopOffsetPerc-.5));
         }
-        else if(percentage > .75 && percentage <= 1){ //(+x,+y)->(+x,-y)
-          open_cont_y_pos = LEG_CONT_g_walkOpenLoopOffsetY/2 - (4*(percentage-.75) * LEG_CONT_g_walkOpenLoopOffsetY );
-          open_cont_x_pos = LEG_CONT_g_walkOpenLoopOffsetX/2;
+        else if(openloopOffsetPerc > .75 && openloopOffsetPerc <= 1){ //(+x,+y)->(+x,-y)
+        	openLoopOffset = LEG_CONT_Point2Point(LEG_CONT_g_walkOpenLoopOffset4, LEG_CONT_g_walkOpenLoopOffset1, 4*(openloopOffsetPerc-.75));
         }
 
         if(STATE == walk){
-			LEG_CONT_walkingGait_1(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.5-open_cont_y_pos);
-			LEG_CONT_walkingGait_1(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.5-open_cont_y_pos);
-			LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  0-open_cont_y_pos);
-			LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  0-open_cont_y_pos);
+			LEG_CONT_walkingGait_1(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffset1, openLoopOffset));
+			LEG_CONT_walkingGait_1(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffset2, openLoopOffset));
+			LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffset3, openLoopOffset));
+			LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffset4, openLoopOffset));
         }else {
-        	LEG_CONT_walkingGait_2(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  -.5-open_cont_y_pos, LEG_CONT_g_walkDirection);
-			LEG_CONT_walkingGait_2(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  -.5-open_cont_y_pos, LEG_CONT_g_walkDirection);
-			LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    .5-open_cont_x_pos,  0-open_cont_y_pos);
-			LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,   -.5-open_cont_x_pos,  0-open_cont_y_pos);
+        	LEG_CONT_walkingGait_2(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffset1, openLoopOffset), LEG_CONT_g_walkDirection);
+			LEG_CONT_walkingGait_2(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffset2, openLoopOffset), LEG_CONT_g_walkDirection);
+			LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffset3, openLoopOffset));
+			LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffset4, openLoopOffset));
         }
 
 
@@ -1543,25 +1518,6 @@ void StartTask06(void *argument)
   /* USER CODE END StartTask06 */
 }
 
-/* USER CODE BEGIN Header_StartTask07 */
-/**
-* @brief Function implementing the applyServoOffse thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask07 */
-void StartTask07(void *argument)
-{
-  /* USER CODE BEGIN StartTask07 */
-  /* Infinite loop */
-  for(;;)
-  {
-		  osDelay(1);
-
-  }
-  /* USER CODE END StartTask07 */
-}
-
 /* USER CODE BEGIN Header_StartTask08 */
 /**
 * @brief Function implementing the piComms thread.
@@ -1671,21 +1627,6 @@ void StartTask08(void *argument)
   }
 
   /* USER CODE END StartTask08 */
-}
-
-/* USER CODE BEGIN Header_StartTask09 */
-/**
-* @brief Function implementing the checkBuffer thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask09 */
-void StartTask09(void *argument)
-{
-  /* USER CODE BEGIN StartTask09 */
-  /* Infinite loop */
-
-  /* USER CODE END StartTask09 */
 }
 
 /**
