@@ -70,133 +70,105 @@ void PSC_clearBuffer() {
 	PSC_BUFFER_INDEX = 0;
 }
 
-int PSC_InterpretCommand(char msg[], int size) {
-	char param[10];
-	char value[10];
-	char token[10];
-	char *endptr;
-	float floatValue = 0;
-	unsigned int i = 0;
-	unsigned int j = 0;
-	unsigned int k = 0;
-	int msgFound = 0;
-	int temp = -1;
-	int tokenTemp = -1;
-	int enumTemp = -1;
-	int tokenLen = 0;
-	unsigned int paramLen = 0;
-	PSC_CMD cmd;
-	for (i = 0; i < size; i++) {
-		if (msg[i] == ',') {
-			msgFound = 1;
+int PSC_ProcessCommand(PSC_CMD cmd){
+	int getOrSet = 0; // 0 for get 1 for set;
+	if(cmd.action == SETPARAM){
+		getOrSet = 1;
+	}
+	switch(cmd.param){
+		case SPEED:
+			if(getOrSet){LEG_CONT_g_walkMaxTime = cmd.vals[0];}
 			break;
-		}
+		case DIST:
+			if(getOrSet){LEG_CONT_g_walkDistance = cmd.vals[0];}
+			break;
+		case HEIGHT:
+			if(getOrSet){LEG_CONT_g_walkHeight = cmd.vals[0];}
+			break;
+		case DIR:
+			if(getOrSet){LEG_CONT_g_walkDirection = cmd.vals[0];}
+			break;
+		case OPLO:
+			if(getOrSet){
+				LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
+				LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
+			}
+			break;
+		case STOF:
+			if(getOrSet){
+				LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
+				LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
+			}
+			break;
 	}
-	tokenTemp = PSC_FindNextToken(msg, token, 0, size);
-	if(tokenTemp){
-		enumTemp = PSC_EvalAction(token, temp);
-		if(enumTemp){
-			cmd.action = enumTemp;
+
+}
+
+int PSC_InterpretCommand(char msg[], int size) {
+
+	char tokens[10][10];
+	int tokenSizes [10];
+	char *endptr;
+	int tokensFound = 0;
+	int numTokens =0;
+	float floatValue = 0;
+	int tokenTemp = -1;
+	int tokenStart = 0;
+	int tokenEnd = 0;
+
+	PSC_CMD cmd;
+	while(!tokensFound){
+		tokenEnd = PSC_FindNextToken(msg, tokens[numTokens], tokenStart, size);
+		if(tokenEnd){
+			if(tokenEnd == size){
+				tokensFound = 1;
+			}else{
+				tokenSizes[numTokens] = tokenEnd-tokenStart;
+				tokenStart = tokenEnd +1;
+				numTokens+=1;
+			}
 		}else{
 			return 0;
 		}
+	}
+	tokenTemp = PSC_EvalAction(tokens[0], tokenSizes[0]);
+	if(tokenTemp){
+		cmd.action = tokenTemp;
+	}else{
+		return 0;
+	}
+	tokenTemp = PSC_EvalParam(tokens[1], tokenSizes[1]);
+	if(tokenTemp){
+		cmd.param = tokenTemp;
 	}else{
 		return 0;
 	}
 
-
-	temp = PSC_FindNextToken(msg, token, tokenTemp, size);
-	if(tokenTemp){
-		tokenLen = temp -tokenTemp;
-		enumTemp = PSC_EvalParam(token, tokenLen);
-		if(enumTemp){
-			cmd.param = enumTemp;
-		}else{
-			return 0;
+	if(numTokens > 2){
+		for(int i=2; i<numTokens; i++){
+			floatValue = strtof(tokens[i], &endptr);
+			if (*endptr != '\0') {
+				return 0;
+			}
+			cmd.vals[i-2] = floatValue;
 		}
-	}else{
-		return 0;
 	}
-
-	while( temp != size){
-
-	}
-//	if (msgFound) {
-//		temp = PSC_EvalAction(msg, i-1);
-//		if (temp > 0 ) {
-//			i++;
-//			cmd.action = temp;
-//			for (j = i; j < size; j++) {
-//				if (msg[j] == ',') {
-//					j++;
-//					for (k = j; k < size; k++) {
-//						value[k - j] = msg[k];
-//					}
-//					floatValue = strtof(value, &endptr);
-//					if (*endptr != '\0') {
-//						return 0;
-//					}
-//					break;
-//				}
-//				floatValue = strtof(value, &endptr);
-//				if (*endptr != '\0') {
-//					return 0;
-//				}
-//				break;
-//				param[j - i] = msg[j];
-//			}
-//
-//			paramLen = j - i - 1;
-//			temp = PSC_EvalParam(param, j-i-1);
-//			if(temp > 0){
-//				cmd.param = temp;
-//			}else{
-//				return 0;
-//			}
-//			if (strncmp(param, "SPEED", paramLen) == 0 && paramLen == 5) {
-//				LEG_CONT_g_walkMaxTime = floatValue;
-//				return 1;
-//			} else if (strncmp(param, "DIST", paramLen) == 0 && paramLen == 4) {
-//				LEG_CONT_g_walkDistance = floatValue;
-//				return 1;
-//			} else if (strncmp(param, "HEIGHT", paramLen) == 0
-//					&& paramLen == 5) {
-//				LEG_CONT_g_walkHeight = floatValue;
-//				return 1;
-//			} else if (strncmp(param, "OPLOX", paramLen) == 0
-//					&& paramLen == 5) {
-//				LEG_CONT_g_walkOpenLoopOffsetX = floatValue;
-//				return 1;
-//			} else if (strncmp(param, "OPLOY", paramLen) == 0
-//					&& paramLen == 5) {
-//				LEG_CONT_g_walkOpenLoopOffsetY = floatValue;
-//				return 1;
-//			} else if (strncmp(param, "DIR", j - i)) {
-//				LEG_CONT_g_walkDirection = floatValue;
-//				return 1;
-//			} else {
-//				return 0;
-//			}
-//		} else {
-//			return 0;
-//		}
-//
-//	}
-	return 0;
+	cmd.numVals = numTokens-2;
+	return 1;
 }
 
 int PSC_FindNextToken(char str[], char token[], int start, int len){
 	int i =0;
 	for(i=start; i<len; i++){
 		token[i] = str[i];
-		if(str[i] == ','){
+		if(str[i] == ',' || str[i] == ';'){
 			return i;
 		}
 	}
 	return -1;
 }
 
-int PSC_EvalAction(char str[],unsigned  int len){
+int PSC_EvalAction(char str[],unsigned int len){
 	for(int i=0; i<NUM_ACTIONS; i++ ){
 		if(strncmp(str, ACTION_STRING[i], len)==0){
 			return i;

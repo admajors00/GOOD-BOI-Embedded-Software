@@ -28,6 +28,8 @@
         PARAM(DIST)  \
         PARAM(HEIGHT)   \
         PARAM(DIR)  \
+		PARAM(OPLO)  \
+		PARAM(STOF)  \
 		PARAM(NUM_PARAMS)
 
 #define GENERATE_ENUM(ENUM) ENUM,
@@ -53,10 +55,8 @@ static const char *ACTION_STRING[] = {
 typedef struct{
 	enum ACTION_ENUM action;
 	enum PARAM_ENUM	param;
-	float fval1;
-	float fval2;
-	float fval3;
-	int ival1;
+	float vals[10];
+	float numVals;
 }PSC_CMD;
 
 
@@ -78,7 +78,7 @@ void PSC_clearBuffer();
 int PSC_InterpretCommand(char msg[], int size);
 //void PSC_checkSerial(int fd);
 
-
+int PSC_FindNextToken(char str[], char token[], int start, int len);
 int PSC_EvalParam(char str[],unsigned  int len);
 int PSC_EvalAction(char str[],unsigned  int len);
 
