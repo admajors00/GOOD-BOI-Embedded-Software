@@ -9,7 +9,9 @@
 #define ROBOT_PISERIALCOMS_PISERIALCOMS_H_
 #include <stdio.h>
 #include <stdlib.h>
+#include "main.h"
 #include "../Robot/LegControl/LegControl_cfg.h"
+#include "../Robot/ADI_IMU/ADI_IMU.h"
 #define PSC_BUFFER_SIZE 32
 #define PSC_START_CHAR 60
 #define PSC_END_CHAR 62
@@ -30,7 +32,10 @@
         PARAM(DIR)  \
 		PARAM(OPLO)  \
 		PARAM(STOF)  \
-		PARAM(NUM_PARAMS)
+		PARAM(PIDX)  \
+		PARAM(PIDY)  \
+		PARAM(IMUDATA)  \
+		PARAM(NUM_PARAMS)\
 
 #define GENERATE_ENUM(ENUM) ENUM,
 #define GENERATE_STRING(STRING) #STRING,
@@ -60,7 +65,7 @@ typedef struct{
 }PSC_CMD;
 
 
-extern PSC_CMD PSC_g_cmd;
+
 typedef struct {                                // object data type
   char Buf[32];
   uint8_t Idx;
@@ -75,7 +80,8 @@ extern volatile int PSC_NEW_DATA_FROM_BOARD;
 
 int PSC_checkBuffer();
 void PSC_clearBuffer();
-int PSC_InterpretCommand(char msg[], int size);
+int PSC_ProcessCommand(PSC_CMD cmd, UART_HandleTypeDef huart);
+int PSC_InterpretCommand(char msg[], int size, UART_HandleTypeDef huart);
 //void PSC_checkSerial(int fd);
 
 int PSC_FindNextToken(char str[], char token[], int start, int len);

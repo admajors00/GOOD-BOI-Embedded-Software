@@ -23,8 +23,8 @@
  * 		OPLOn	|	Openloop offset values x y
  */
 #include "PiSerialComs.h"
-#include <stdio.h>
-#include <stdlib.h>
+
+
 char PSC_INPUT_BUFFER[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0 };
 char PSC_MESSAGE[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -34,8 +34,6 @@ int PSC_MSG_LEN = 0;
 
 volatile int PSC_NEW_DATA_FROM_BOARD = 0;
 
-
-PSC_CMD PSC_g_cmd;
 
 
 int PSC_checkBuffer() {
@@ -70,41 +68,79 @@ void PSC_clearBuffer() {
 	PSC_BUFFER_INDEX = 0;
 }
 
-int PSC_ProcessCommand(PSC_CMD cmd){
+int PSC_ProcessCommand(PSC_CMD cmd, UART_HandleTypeDef huart){
 	int getOrSet = 0; // 0 for get 1 for set;
+	int messageLen = 0;
+	char response[50];
 	if(cmd.action == SETPARAM){
 		getOrSet = 1;
 	}
 	switch(cmd.param){
 		case SPEED:
 			if(getOrSet){LEG_CONT_g_walkMaxTime = cmd.vals[0];}
+			else{
+				messageLen = sprintf(response, "<%0.2f;>",LEG_CONT_g_walkMaxTime);
+				HAL_UART_Transmit_IT(&huart, (uint8_t*)&response, messageLen);
+			}
 			break;
 		case DIST:
 			if(getOrSet){LEG_CONT_g_walkDistance = cmd.vals[0];}
+			else{
+				messageLen = sprintf(response, "<%0.2f;>",LEG_CONT_g_walkDistance);
+				HAL_UART_Transmit_IT(&huart, (uint8_t*)&response, messageLen);
+			}
 			break;
 		case HEIGHT:
 			if(getOrSet){LEG_CONT_g_walkHeight = cmd.vals[0];}
+			else{
+				messageLen = sprintf(response, "<%0.2f;>",LEG_CONT_g_walkHeight);
+				HAL_UART_Transmit_IT(&huart, (uint8_t*)&response, messageLen);
+			}
 			break;
 		case DIR:
 			if(getOrSet){LEG_CONT_g_walkDirection = cmd.vals[0];}
+			else{
+				messageLen = sprintf(response, "<%0.2f;>",LEG_CONT_g_walkDirection);
+				HAL_UART_Transmit_IT(&huart, (uint8_t*)&response, messageLen);
+			}
 			break;
 		case OPLO:
 			if(getOrSet){
 				LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
 				LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
+			}else{
+				messageLen = sprintf(response, "<%0.2f,%0.2f;>",LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x, LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y);
+				HAL_UART_Transmit_IT(&huart, (uint8_t*)&response, messageLen);
 			}
 			break;
 		case STOF:
 			if(getOrSet){
 				LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
 				LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
+			}else{
+				messageLen = sprintf(response, "<%0.2f,%0.2f;>",LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x, LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y);
+				HAL_UART_Transmit_IT(&huart, (uint8_t*)&response, messageLen);
 			}
 			break;
+		case IMUDATA:
+			if(!getOrSet){
+				messageLen = sprintf(response, "<%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f;>",
+										ADI_IMU_burstReadBufScaled[2],
+										ADI_IMU_burstReadBufScaled[3],
+										ADI_IMU_burstReadBufScaled[4],
+										ADI_IMU_burstReadBufScaled[5],
+										ADI_IMU_burstReadBufScaled[6],
+										ADI_IMU_burstReadBufScaled[7]);
+				HAL_UART_Transmit_IT(&huart, (uint8_t*)&response, messageLen);
+			}
+			break;
+		default:
+			return 0;
 	}
-
+	return 1;
 }
 
-int PSC_InterpretCommand(char msg[], int size) {
+int PSC_InterpretCommand(char msg[], int size,  UART_HandleTypeDef huart) {
 
 	char tokens[10][10];
 	int tokenSizes [10];
@@ -154,6 +190,7 @@ int PSC_InterpretCommand(char msg[], int size) {
 		}
 	}
 	cmd.numVals = numTokens-2;
+	PSC_ProcessCommand(cmd, huart);
 	return 1;
 }
 
