@@ -71,21 +71,28 @@ typedef struct {                                // object data type
   uint8_t Idx;
 } PSC_MSGQUEUE;
 
-extern char PSC_INPUT_BUFFER[PSC_BUFFER_SIZE];
-extern char PSC_MESSAGE[PSC_BUFFER_SIZE];
+void PSC_InitBuffers();
 
+extern char PSC_INPUT_BUFFER[PSC_BUFFER_SIZE];
+extern volatile char PSC_OUTPUT_BUFFER[PSC_BUFFER_SIZE];
+extern char PSC_MESSAGE[PSC_BUFFER_SIZE];
+extern volatile int PSC_g_outputDataReady;
+extern volatile int PSC_g_outputDataLen;
 extern int  PSC_BUFFER_INDEX;
 extern int PSC_MSG_LEN;
 extern volatile int PSC_NEW_DATA_FROM_BOARD;
 
 int PSC_checkBuffer();
 void PSC_clearBuffer();
-int PSC_ProcessCommand(PSC_CMD cmd, UART_HandleTypeDef huart);
-int PSC_InterpretCommand(char msg[], int size, UART_HandleTypeDef huart);
+int PSC_ProcessCommand(PSC_CMD cmd);
+int PSC_InterpretCommand(char msg[], int size);
 //void PSC_checkSerial(int fd);
 
 int PSC_FindNextToken(char str[], char token[], int start, int len);
 int PSC_EvalParam(char str[],unsigned  int len);
 int PSC_EvalAction(char str[],unsigned  int len);
+
+int PSC_SendToOutputBuffer(char msg[], int len);
+int PSC_ClearOutBuffer();
 
 #endif /* ROBOT_PISERIALCOMS_PISERIALCOMS_H_ */

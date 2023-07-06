@@ -77,7 +77,7 @@ void LEG_CONT_walkingGait_2(LEG_CONT_Leg leg, float start, float distance, float
 
 VECT_3D LEG_CONT_Point2Point(VECT_3D p1, VECT_3D p2, float percent){
 	VECT_3D pos;
-	float angle = atan2(p1.y-p2.y,p1.x-p2.x);
+	float angle = atan2(p1.x-p2.x,p1.y-p2.y);
 	float distance = sqrt(pow(p1.x-p2.x,2) + pow(p1.y-p2.y, 2));
 	pos.y = percent * distance * cos(angle);
 	pos.x = percent* distance * sin(angle);
