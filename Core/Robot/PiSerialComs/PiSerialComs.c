@@ -78,77 +78,89 @@ void PSC_clearBuffer() {
 
 int PSC_ProcessCommand(PSC_CMD cmd){
 	int getOrSet = 0; // 0 for get 1 for set;
-	int messageLen = 0;
-	char response[20];
+	PSC_CMD responseCmd;
+
 	if(cmd.action == SETPARAM){
-		messageLen = sprintf(response, "<%s set>",PARAM_STRING[cmd.param]);
-		PSC_SendToOutputBuffer( response, messageLen);
+		//messageLen = sprintf(response, "<%s set>",PARAM_STRING[cmd.param]);
+		//PSC_SendToOutputBuffer( response, messageLen);
 		getOrSet = 1;
+	}else{
+		responseCmd.action = SETPARAM;
+		responseCmd.param = cmd.param;
 	}
+
 	switch(cmd.param){
-		case SPEED:
-			if(getOrSet){LEG_CONT_g_walkMaxTime = cmd.vals[0];}
-			else{
-				messageLen = sprintf(response, "<%0.2f;>",LEG_CONT_g_walkMaxTime);
-				PSC_SendToOutputBuffer( response, messageLen);
-			}
-			break;
-		case DIST:
-			if(getOrSet){LEG_CONT_g_walkDistance = cmd.vals[0];}
-			else{
-				messageLen = sprintf(response, "<%0.2f;>",LEG_CONT_g_walkDistance);
-				PSC_SendToOutputBuffer(response, messageLen);
-			}
-			break;
-		case HEIGHT:
-			if(getOrSet){LEG_CONT_g_walkHeight = cmd.vals[0];}
-			else{
-				messageLen = sprintf(response, "<%0.2f;>",LEG_CONT_g_walkHeight);
-				PSC_SendToOutputBuffer( response, messageLen);
-			}
-			break;
-		case DIR:
-			if(getOrSet){LEG_CONT_g_walkDirection = cmd.vals[0];}
-			else{
-				messageLen = sprintf(response, "<%0.2f;>",LEG_CONT_g_walkDirection);
-				PSC_SendToOutputBuffer( response, messageLen);
-			}
-			break;
-		case OPLO:
-			if(getOrSet){
-				LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
-				LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
-			}else{
-				messageLen = sprintf(response, "<%0.2f,%0.2f;>",LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x, LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y);
-				PSC_SendToOutputBuffer( response, messageLen);
-			}
-			break;
-		case STOF:
-			if(getOrSet){
-				LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
-				LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
-			}else{
-				messageLen = sprintf(response, "<%0.2f,%0.2f;>",LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x, LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y);
-				PSC_SendToOutputBuffer( response, messageLen);
-			}
-			break;
-		case IMUDATA:
-			if(!getOrSet){
-				messageLen = sprintf(response, "<%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f;>",
-										ADI_IMU_burstReadBufScaled[2],
-										ADI_IMU_burstReadBufScaled[3],
-										ADI_IMU_burstReadBufScaled[4],
-										ADI_IMU_burstReadBufScaled[5],
-										ADI_IMU_burstReadBufScaled[6],
-										ADI_IMU_burstReadBufScaled[7]);
-				PSC_SendToOutputBuffer( response, messageLen);
-			}
-			break;
-		default:
-			return 0;
+	case SPEED:
+		if(getOrSet){LEG_CONT_g_walkMaxTime = cmd.vals[0];}
+		else{
+			responseCmd.numVals = 1;
+			responseCmd.vals[0] = LEG_CONT_g_walkMaxTime;
+		}
+		break;
+	case DIST:
+		if(getOrSet){LEG_CONT_g_walkDistance = cmd.vals[0];}
+		else{
+			responseCmd.numVals = 1;
+			responseCmd.vals[0] =LEG_CONT_g_walkDistance;
+		}
+		break;
+	case HEIGHT:
+		if(getOrSet){LEG_CONT_g_walkHeight = cmd.vals[0];}
+		else{
+			responseCmd.numVals = 1;
+			responseCmd.vals[0] =LEG_CONT_g_walkHeight;
+		}
+		break;
+	case DIR:
+		if(getOrSet){LEG_CONT_g_walkDirection = cmd.vals[0];}
+		else{
+			responseCmd.numVals = 1;
+			responseCmd.vals[0] =LEG_CONT_g_walkDirection;
+		}
+		break;
+	case OPLO:
+		if(getOrSet){
+			LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
+			LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
+		}else{
+			responseCmd.numVals = 3;
+			responseCmd.vals[0] = cmd.vals[0];
+			responseCmd.vals[1] = LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x;
+			responseCmd.vals[2] = LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y;
+		}
+		break;
+	case STOF:
+		if(getOrSet){
+			LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
+			LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
+		}else{
+			responseCmd.numVals = 3;
+			responseCmd.vals[0] = cmd.vals[0];
+			responseCmd.vals[1] = LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x;
+			responseCmd.vals[2] = LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y;
+		}
+		break;
+	case IMUDATA:
+		if(!getOrSet){
+			responseCmd.numVals = 6;
+			responseCmd.vals[0] = ADI_IMU_burstReadBufScaled[2];
+			responseCmd.vals[1] = ADI_IMU_burstReadBufScaled[3];
+			responseCmd.vals[2] = ADI_IMU_burstReadBufScaled[4];
+			responseCmd.vals[3] = ADI_IMU_burstReadBufScaled[5];
+			responseCmd.vals[4] = ADI_IMU_burstReadBufScaled[6];
+			responseCmd.vals[5] = ADI_IMU_burstReadBufScaled[7];
+		}
+		break;
+	default:
+		return 0;
+
+	}
+	if(!getOrSet){
+		return PSC_SendCmd(responseCmd);
 	}
 	return 1;
 }
+
 
 int PSC_InterpretCommand(char msg[], int size) {
 
@@ -204,6 +216,17 @@ int PSC_InterpretCommand(char msg[], int size) {
 	cmd.numVals = numTokens-2;
 	PSC_ProcessCommand(cmd);
 	return 1;
+}
+
+int PSC_SendCmd(PSC_CMD cmd){
+	char response[50];
+	int len;
+	sprintf(response,"<%s,%s", ACTION_STRING[cmd.action], PARAM_STRING[cmd.param]);
+	for(int i=0; i<cmd.numVals; i++){
+		sprintf("%s,%0.2f", response, cmd.vals[i]);
+	}
+	len = sprintf("%s;>", response);
+	return PSC_SendToOutputBuffer(response, len);
 }
 
 int PSC_FindNextToken(char str[], char token[], int start, int len){

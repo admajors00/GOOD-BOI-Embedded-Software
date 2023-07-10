@@ -22,6 +22,7 @@
 #define FOREACH_ACTION(ACTION) \
         ACTION(GETPARAM)   \
         ACTION(SETPARAM)  \
+		ACTION(RETPARAM)  \
 		ACTION(NUM_ACTIONS) \
 
 
@@ -71,7 +72,7 @@ typedef struct {                                // object data type
   uint8_t Idx;
 } PSC_MSGQUEUE;
 
-void PSC_InitBuffers();
+
 
 extern char PSC_INPUT_BUFFER[PSC_BUFFER_SIZE];
 extern volatile char PSC_OUTPUT_BUFFER[PSC_BUFFER_SIZE];
@@ -82,12 +83,14 @@ extern int  PSC_BUFFER_INDEX;
 extern int PSC_MSG_LEN;
 extern volatile int PSC_NEW_DATA_FROM_BOARD;
 
+void PSC_InitBuffers();
+
 int PSC_checkBuffer();
 void PSC_clearBuffer();
 int PSC_ProcessCommand(PSC_CMD cmd);
 int PSC_InterpretCommand(char msg[], int size);
 //void PSC_checkSerial(int fd);
-
+int PSC_SendCmd(PSC_CMD cmd);
 int PSC_FindNextToken(char str[], char token[], int start, int len);
 int PSC_EvalParam(char str[],unsigned  int len);
 int PSC_EvalAction(char str[],unsigned  int len);

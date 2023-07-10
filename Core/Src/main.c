@@ -1549,8 +1549,7 @@ void StartTask08(void *argument)
 	PSC_MSGQUEUE msg;
 
 	osStatus_t status;
-	char startChar = '<';
-	char endChar = '>';
+
 	int messageLen = 0;
 	//char[100] response;
 	for(;;)
