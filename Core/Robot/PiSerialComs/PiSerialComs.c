@@ -223,9 +223,9 @@ int PSC_SendCmd(PSC_CMD cmd){
 	int len;
 	sprintf(response,"<%s,%s", ACTION_STRING[cmd.action], PARAM_STRING[cmd.param]);
 	for(int i=0; i<cmd.numVals; i++){
-		sprintf("%s,%0.2f", response, cmd.vals[i]);
+		sprintf(response,"%s,%0.2f", response, cmd.vals[i]);
 	}
-	len = sprintf("%s;>", response);
+	len = sprintf(response,"%s;>", response);
 	return PSC_SendToOutputBuffer(response, len);
 }
 
