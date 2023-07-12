@@ -3,6 +3,12 @@
  *
  *  Created on: Mar 5, 2021
  *      Author: Troll
+ *
+ *
+ * This file configures variaous paramerters used for controlling the legs
+ * such as calibration values
+ *
+ *
  */
 
 #ifndef ROBOT_LEGCONTROL_LEGCONTROL_CFG_H_
@@ -10,6 +16,7 @@
 
 #include "LegControl.h"
 #include "../Robot/Vectors.h"
+#include "../Robot/PiSerialComs/PiSerialComs.h"
 
 #define LEG_CONT_NUM_SERVOS 12
 #define IS_RTOS_USED  1
@@ -61,6 +68,7 @@ extern const float step_;
 extern const float HIP_OFFSET;
 extern const float angle;
 extern const float l;
+
 
 extern LEG_CONT_Leg L_1;
 extern LEG_CONT_Leg L_2;
