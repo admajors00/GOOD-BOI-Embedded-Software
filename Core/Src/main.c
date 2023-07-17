@@ -1386,7 +1386,7 @@ void StartTask04(void *argument)
 	float l3_start = LEG_CONT_g_walkDistance/ 4;
 	float l4_start = LEG_CONT_g_walkDistance;
 	float percentage = 0;
-	float openloopOffsetPerc = percentage +.125;
+	float openloopOffsetPerc = percentage;
 
 	for(;;){
 		if(STATE != wait){
@@ -1564,7 +1564,7 @@ void StartTask08(void *argument)
 				msg.Buf[i] =PSC_MESSAGE[i];
 			}
 			msg.Idx= PSC_MSG_LEN;
-			PSC_clearBuffer();
+			//PSC_clearBuffer();
 			//	  status = osMessageQueueGet(serialMessages_QueueHandle, &msg, NULL, 10U);   // wait for message
 			//	  if (status == osOK) {
 			if(strncmp(msg.Buf, "brdIdRqst", msg.Idx)==0){
@@ -1609,7 +1609,11 @@ void StartTask08(void *argument)
 			}else if(PSC_InterpretCommand(msg.Buf, msg.Idx)){
 				char response[] = "<cmd recieved>";
 				//HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
-				HAL_UART_Transmit_IT(&huart2, (uint8_t*)&PSC_OUTPUT_BUFFER, PSC_g_outputDataLen);
+				if(PSC_g_outputDataReady){
+					HAL_UART_Transmit_IT(&huart2, (uint8_t*)&PSC_OUTPUT_BUFFER, PSC_g_outputDataLen);
+				}else{
+					HAL_UART_Receive_IT(&huart2, (uint8_t *)&PSC_INPUT_BUFFER[PSC_BUFFER_INDEX], 1);
+				}
 				//
 				//HAL_UART_Transmit_IT(&huart2, (uint8_t*)&response, sizeof(response));
 				//HAL_UART_Transmit(&huart2, (uint8_t*)&endChar, 1, 1);

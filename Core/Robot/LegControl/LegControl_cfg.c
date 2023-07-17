@@ -25,17 +25,17 @@ volatile float LEG_CONT_g_walkDirection = 0;
 //(-x,-y)->(-x,+y)
 //(-x,+y)->(+x,+y)
 //(+x,+y)->(+x,-y)
-volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset1 = { .5, -.5, 0};
-volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset2 = {-.5, -.5, 0};
-volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset3 = {-.5,  .5, 0};
-volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset4 = { .5,  .5, 0};
+volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset1 = { .4, -.0, 0};
+volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset2 = {-.4, -.0, 0};
+volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset3 = {-.4,  .5, 0};
+volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset4 = { .4,  .5, 0};
 
 volatile  VECT_3D LEG_CONT_g_walkOpenLoopOffsets[4] = {};
 
-volatile VECT_3D LEG_CONT_g_walkStartOffset1 = { .5, -.5, 0};
-volatile VECT_3D LEG_CONT_g_walkStartOffset2 = {-.5, -.5, 0};
-volatile VECT_3D LEG_CONT_g_walkStartOffset3 = {.5,  0, 0};
-volatile VECT_3D LEG_CONT_g_walkStartOffset4 = { -.5,  0, 0};
+volatile VECT_3D LEG_CONT_g_walkStartOffset1 = { .75, -.75, 0};
+volatile VECT_3D LEG_CONT_g_walkStartOffset2 = {-.75, -.75, 0};
+volatile VECT_3D LEG_CONT_g_walkStartOffset3 = {.75,  0, 0};
+volatile VECT_3D LEG_CONT_g_walkStartOffset4 = { -.75,  0, 0};
 
 volatile  VECT_3D LEG_CONT_g_walkStartOffsets[4] = {};
 

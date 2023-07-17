@@ -79,8 +79,8 @@ VECT_3D LEG_CONT_Point2Point(VECT_3D p1, VECT_3D p2, float percent){
 	VECT_3D pos;
 	float angle = atan2(p1.y-p2.y,p1.x-p2.x);
 	float distance = sqrt(pow(p1.x-p2.x,2) + pow(p1.y-p2.y, 2));
-	pos.y = percent * distance * sin(angle);
-	pos.x = percent* distance * cos(angle);
+	pos.y =( percent * distance * sin(angle))-p1.y;
+	pos.x = (percent* distance * cos(angle))-p1.x;
 	pos.z = 0;
 	return pos;
 }

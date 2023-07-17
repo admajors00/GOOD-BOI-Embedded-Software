@@ -12,7 +12,7 @@
 #include "main.h"
 #include "../Robot/LegControl/LegControl_cfg.h"
 #include "../Robot/ADI_IMU/ADI_IMU.h"
-#define PSC_BUFFER_SIZE 32
+#define PSC_BUFFER_SIZE 100
 #define PSC_START_CHAR 60
 #define PSC_END_CHAR 62
 #define PSC_BOARD_ID 1
