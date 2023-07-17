@@ -220,8 +220,8 @@ int PSC_InterpretCommand(char msg[], int size) {
 		}
 	}
 	cmd.numVals = numTokens-2;
-	PSC_ProcessCommand(cmd);
-	return 1;
+	return PSC_ProcessCommand(cmd);
+
 }
 
 int PSC_SendCmd(PSC_CMD cmd){
