@@ -79,12 +79,16 @@ void PSC_clearBuffer() {
 int PSC_ProcessCommand(PSC_CMD cmd){
 	int getOrSet = 0; // 0 for get 1 for set;
 	PSC_CMD responseCmd;
-
+	responseCmd.param = cmd.param;
+	if(cmd.action == ACTION_ERROR || cmd.param == PARAM_ERROR){
+		responseCmd.action = cmd.action;
+		responseCmd.param = cmd.param;
+		return PSC_SendCmd(responseCmd);
+	}
 	if(cmd.action == SETPARAM){
-		//messageLen = sprintf(response, "<%s set>",PARAM_STRING[cmd.param]);
-		//PSC_SendToOutputBuffer( response, messageLen);
 		getOrSet = 1;
-	}else{
+		responseCmd.action = ACKPARAM;
+	}else if (cmd.action == GETPARAM){
 		responseCmd.action = SETPARAM;
 		responseCmd.param = cmd.param;
 	}
@@ -155,10 +159,9 @@ int PSC_ProcessCommand(PSC_CMD cmd){
 		return 0;
 
 	}
-	if(!getOrSet){
-		return PSC_SendCmd(responseCmd);
-	}
-	return 1;
+
+
+	return PSC_SendCmd(responseCmd);
 }
 
 
@@ -173,6 +176,7 @@ int PSC_InterpretCommand(char msg[], int size) {
 	int tokenTemp = -1;
 	int tokenStart = 0;
 	int tokenEnd = 0;
+	int cmdError = 0;
 
 	PSC_CMD cmd = {};
 	while(!tokensFound){
@@ -195,16 +199,18 @@ int PSC_InterpretCommand(char msg[], int size) {
 	if(tokenTemp>=0){
 		cmd.action = tokenTemp;
 	}else{
-		return 0;
+		cmd.action = ACTION_ERROR;
+		cmdError = 1;
 	}
 	tokenTemp = PSC_EvalParam(tokens[1], tokenSizes[1]);
 	if(tokenTemp>=0){
 		cmd.param = tokenTemp;
 	}else{
-		return 0;
+		cmd.param = PARAM_ERROR;
+		cmdError = 1;
 	}
 
-	if(numTokens > 2){
+	if(numTokens > 2 && !cmdError){
 		for(int i=2; i<numTokens; i++){
 			floatValue = strtof(tokens[i], &endptr);
 			if (*endptr != '\0') {
