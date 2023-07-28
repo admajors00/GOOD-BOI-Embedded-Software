@@ -10,7 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "main.h"
-#include "../Robot/LegControl/LegControl_cfg.h"
+#include "../Robot/LegControl/LegControl.h"
+#include "../Robot/DogControl/DogControl.h"
 #include "../Robot/ADI_IMU/ADI_IMU.h"
 #define PSC_BUFFER_SIZE 100
 #define PSC_START_CHAR 60
@@ -90,7 +91,7 @@ void PSC_InitBuffers();
 
 int PSC_checkBuffer();
 void PSC_clearBuffer();
-int PSC_ProcessCommand(PSC_CMD cmd);
+
 int PSC_InterpretCommand(char msg[], int size);
 //void PSC_checkSerial(int fd);
 int PSC_SendCmd(PSC_CMD cmd);

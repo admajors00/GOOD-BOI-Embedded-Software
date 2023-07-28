@@ -76,93 +76,7 @@ void PSC_clearBuffer() {
 	PSC_BUFFER_INDEX = 0;
 }
 
-int PSC_ProcessCommand(PSC_CMD cmd){
-	int getOrSet = 0; // 0 for get 1 for set;
-	PSC_CMD responseCmd;
-	responseCmd.param = cmd.param;
-	if(cmd.action == ACTION_ERROR || cmd.param == PARAM_ERROR){
-		responseCmd.action = cmd.action;
-		responseCmd.param = cmd.param;
-		return PSC_SendCmd(responseCmd);
-	}
-	if(cmd.action == SETPARAM){
-		getOrSet = 1;
-		responseCmd.action = ACKPARAM;
-	}else if (cmd.action == GETPARAM){
-		responseCmd.action = SETPARAM;
-		responseCmd.param = cmd.param;
-	}
 
-	switch(cmd.param){
-	case SPEED:
-		if(getOrSet){LEG_CONT_g_walkMaxTime = cmd.vals[0];}
-		else{
-			responseCmd.numVals = 1;
-			responseCmd.vals[0] = LEG_CONT_g_walkMaxTime;
-		}
-		break;
-	case DIST:
-		if(getOrSet){LEG_CONT_g_walkDistance = cmd.vals[0];}
-		else{
-			responseCmd.numVals = 1;
-			responseCmd.vals[0] =LEG_CONT_g_walkDistance;
-		}
-		break;
-	case HEIGHT:
-		if(getOrSet){LEG_CONT_g_walkHeight = cmd.vals[0];}
-		else{
-			responseCmd.numVals = 1;
-			responseCmd.vals[0] =LEG_CONT_g_walkHeight;
-		}
-		break;
-	case DIR:
-		if(getOrSet){LEG_CONT_g_walkDirection = cmd.vals[0];}
-		else{
-			responseCmd.numVals = 1;
-			responseCmd.vals[0] =LEG_CONT_g_walkDirection;
-		}
-		break;
-	case OPLO:
-		if(getOrSet){
-			LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
-			LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
-		}else{
-			responseCmd.numVals = 3;
-			responseCmd.vals[0] = cmd.vals[0];
-			responseCmd.vals[1] = LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].x;
-			responseCmd.vals[2] = LEG_CONT_g_walkOpenLoopOffsets[(int)cmd.vals[0]].y;
-		}
-		break;
-	case STOF:
-		if(getOrSet){
-			LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x = cmd.vals[1];
-			LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y = cmd.vals[2];
-		}else{
-			responseCmd.numVals = 3;
-			responseCmd.vals[0] = cmd.vals[0];
-			responseCmd.vals[1] = LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].x;
-			responseCmd.vals[2] = LEG_CONT_g_walkStartOffsets[(int)cmd.vals[0]].y;
-		}
-		break;
-	case IMUDATA:
-		if(!getOrSet){
-			responseCmd.numVals = 6;
-			responseCmd.vals[0] = ADI_IMU_burstReadBufScaled[2];
-			responseCmd.vals[1] = ADI_IMU_burstReadBufScaled[3];
-			responseCmd.vals[2] = ADI_IMU_burstReadBufScaled[4];
-			responseCmd.vals[3] = ADI_IMU_burstReadBufScaled[5];
-			responseCmd.vals[4] = ADI_IMU_burstReadBufScaled[6];
-			responseCmd.vals[5] = ADI_IMU_burstReadBufScaled[7];
-		}
-		break;
-	default:
-		return 0;
-
-	}
-
-
-	return PSC_SendCmd(responseCmd);
-}
 
 
 int PSC_InterpretCommand(char msg[], int size) {
@@ -220,7 +134,7 @@ int PSC_InterpretCommand(char msg[], int size) {
 		}
 	}
 	cmd.numVals = numTokens-2;
-	return PSC_ProcessCommand(cmd);
+	return DOG_CONT_ProcessCommand(cmd);
 
 }
 

@@ -38,6 +38,10 @@ This file controls the legs in 3 dimensions
 #define NUM_LEGS 4
 #define LEG_CONT_NUM_SERVOS 12
 
+#define PI 3.14159265358979323846
+#define RAD_TO_DEG 57.2958
+#define DEG_TO_RAD .0175
+
 
 extern float LEG_CONT_servoAngles[12];
 extern float LEG_CONT_servoOffsets[12];
@@ -72,10 +76,8 @@ float h(float x);
 
 float semi_circle_step(float x, float distance, float height);
 
-void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, VECT_3D offset);
-void LEG_CONT_walkingGait_2(LEG_CONT_Leg leg, float start, float distance, float percentage, VECT_3D offset, float angle);
 
-VECT_3D LEG_CONT_Point2Point(VECT_3D p1, VECT_3D p2, float percent);
+
 /*
  * singleStep moves the foot a specified distance at a certain angle. The path can be described by
  * f(x), g(x) or h(x)

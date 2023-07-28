@@ -22,6 +22,8 @@ float VECT_Mag3D(VECT_3D v);
 float VECT_AngleXY(VECT_3D p1, VECT_3D p2);
 float VECT_DistXY(VECT_3D p1, VECT_3D p2);
 
+//returns a point on the line connecting p1 and p2 at the percentage given
+VECT_3D VECT_Point2Point(VECT_3D p1, VECT_3D p2, float percent);
 
 
 

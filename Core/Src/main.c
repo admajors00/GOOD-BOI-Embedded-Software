@@ -31,6 +31,8 @@
 #include "../Robot/ADI_IMU/ADI_IMU.h"
 #include "../Robot/LegControl/LegControl.h"
 #include "../Robot/LegControl/LegControl_cfg.h"
+#include "../Robot/DogControl/DogControl.h"
+#include "../Robot/DogControl/DogControl_cfg.h"
 #include "../Robot/Queue.h"
 #include "../Inc/mutexs.h"
 #include "../Robot/PiSerialComs/PiSerialComs.h"
@@ -337,20 +339,20 @@ int main(void)
 	HAL_SPI_MspInit(&hspi3);
 	LEG_CONT_initServos();
 	/////IS_RTOS_USED = 0;
-	LEG_CONT_setPosXYZ(L_1, 0,0,LEG_CONT_g_walkHeight);
-	LEG_CONT_setPosXYZ(L_2, 0,0,LEG_CONT_g_walkHeight);
-	LEG_CONT_setPosXYZ(L_3, 0,0,LEG_CONT_g_walkHeight);
-	LEG_CONT_setPosXYZ(L_4, 0,0,LEG_CONT_g_walkHeight);
+	LEG_CONT_setPosXYZ(L_1, 0,0,DOG_CONT_g_walkHeight);
+	LEG_CONT_setPosXYZ(L_2, 0,0,DOG_CONT_g_walkHeight);
+	LEG_CONT_setPosXYZ(L_3, 0,0,DOG_CONT_g_walkHeight);
+	LEG_CONT_setPosXYZ(L_4, 0,0,DOG_CONT_g_walkHeight);
 	for(int i=0; i<LEG_CONT_NUM_SERVOS; i++){
 		SERVO_MoveTo(i, LEG_CONT_servoAngles[i]);
 	}
 	//IS_RTOS_USED = 1;
 	//  HAL_DMA_RegisterCallback(&hspi4, HAL_DMA_XFER_CPLT_CB_ID, &DMATransferComplete);
 	//pull cs high
-	LEG_CONT_g_walkOpenLoopOffsets[0] = LEG_CONT_g_walkOpenLoopOffset1;
-	LEG_CONT_g_walkOpenLoopOffsets[1] = LEG_CONT_g_walkOpenLoopOffset2;
-	LEG_CONT_g_walkOpenLoopOffsets[2] = LEG_CONT_g_walkOpenLoopOffset3;
-	LEG_CONT_g_walkOpenLoopOffsets[3] = LEG_CONT_g_walkOpenLoopOffset4;
+	DOG_CONT_g_walkOpenLoopOffsets[0] = DOG_CONT_g_walkOpenLoopOffset1;
+	DOG_CONT_g_walkOpenLoopOffsets[1] = DOG_CONT_g_walkOpenLoopOffset2;
+	DOG_CONT_g_walkOpenLoopOffsets[2] = DOG_CONT_g_walkOpenLoopOffset3;
+	DOG_CONT_g_walkOpenLoopOffsets[3] = DOG_CONT_g_walkOpenLoopOffset4;
 
 	LEG_CONT_g_walkStartOffsets[0] = LEG_CONT_g_walkStartOffset1;
 	LEG_CONT_g_walkStartOffsets[1] = LEG_CONT_g_walkStartOffset2;
@@ -1381,49 +1383,49 @@ void StartTask04(void *argument)
 	float time = 0;
 	VECT_3D openLoopOffset = {0,0,0};
 
-	float l1_start = LEG_CONT_g_walkDistance/2;
-	float l2_start = LEG_CONT_g_walkDistance *3/4;
-	float l3_start = LEG_CONT_g_walkDistance/ 4;
-	float l4_start = LEG_CONT_g_walkDistance;
+	float l1_start = DOG_CONT_g_walkDistance/2;
+	float l2_start = DOG_CONT_g_walkDistance *3/4;
+	float l3_start = DOG_CONT_g_walkDistance/ 4;
+	float l4_start = DOG_CONT_g_walkDistance;
 	float percentage = 0;
 	float openloopOffsetPerc = percentage;
 
 	for(;;){
 		if(STATE != wait){
 			if(STATE == walk || STATE == walkdir){
-				percentage = time/LEG_CONT_g_walkMaxTime;
+				percentage = time/DOG_CONT_g_walkMaxTime;
 				openloopOffsetPerc =percentage +.125;
 				if( openloopOffsetPerc >=1 ){
 					openloopOffsetPerc -=1;
 				}
 				if(openloopOffsetPerc <= .25){ //(+x,-y)->(-x,-y)
-					openLoopOffset = LEG_CONT_Point2Point(LEG_CONT_g_walkOpenLoopOffsets[0], LEG_CONT_g_walkOpenLoopOffsets[1], 4*openloopOffsetPerc);
+					openLoopOffset = VECT_Point2Point(DOG_CONT_g_walkOpenLoopOffsets[0], DOG_CONT_g_walkOpenLoopOffsets[1], 4*openloopOffsetPerc);
 				}
 				else if(openloopOffsetPerc > .25 && openloopOffsetPerc <= .5){ //(-x,-y)->(-x,+y)-
-					openLoopOffset = LEG_CONT_Point2Point(LEG_CONT_g_walkOpenLoopOffsets[1], LEG_CONT_g_walkOpenLoopOffsets[2], 4*(openloopOffsetPerc-.25));
+					openLoopOffset = VECT_Point2Point(DOG_CONT_g_walkOpenLoopOffsets[1], DOG_CONT_g_walkOpenLoopOffsets[2], 4*(openloopOffsetPerc-.25));
 				}
 				else if(openloopOffsetPerc > .5 && openloopOffsetPerc <= .75){ //(-x,+y)->(+x,+y)
-					openLoopOffset = LEG_CONT_Point2Point(LEG_CONT_g_walkOpenLoopOffsets[2], LEG_CONT_g_walkOpenLoopOffsets[3], 4*(openloopOffsetPerc-.5));
+					openLoopOffset = VECT_Point2Point(DOG_CONT_g_walkOpenLoopOffsets[2], DOG_CONT_g_walkOpenLoopOffsets[3], 4*(openloopOffsetPerc-.5));
 				}
 				else if(openloopOffsetPerc > .75 && openloopOffsetPerc <= 1){ //(+x,+y)->(+x,-y)
-					openLoopOffset = LEG_CONT_Point2Point(LEG_CONT_g_walkOpenLoopOffsets[3], LEG_CONT_g_walkOpenLoopOffsets[0], 4*(openloopOffsetPerc-.75));
+					openLoopOffset = VECT_Point2Point(DOG_CONT_g_walkOpenLoopOffsets[3], DOG_CONT_g_walkOpenLoopOffsets[0], 4*(openloopOffsetPerc-.75));
 				}
 
 				if(STATE == walk){
-					LEG_CONT_walkingGait_1(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[0], openLoopOffset));
-					LEG_CONT_walkingGait_1(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[1], openLoopOffset));
-					LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[2], openLoopOffset));
-					LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[3], openLoopOffset));
+					DOG_CONT_walkingGait_1(L_1, l1_start, DOG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[0], openLoopOffset));
+					DOG_CONT_walkingGait_1(L_2, l2_start, DOG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[1], openLoopOffset));
+					DOG_CONT_walkingGait_1(L_3, l3_start, DOG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[2], openLoopOffset));
+					DOG_CONT_walkingGait_1(L_4, l4_start, DOG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[3], openLoopOffset));
 				}else {
-					LEG_CONT_walkingGait_2(L_1, l1_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[0], openLoopOffset), LEG_CONT_g_walkDirection);
-					LEG_CONT_walkingGait_2(L_2, l2_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[1], openLoopOffset), LEG_CONT_g_walkDirection);
-					LEG_CONT_walkingGait_1(L_3, l3_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[2], openLoopOffset));
-					LEG_CONT_walkingGait_1(L_4, l4_start, LEG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[3], openLoopOffset));
+					DOG_CONT_walkingGait_2(L_1, l1_start, DOG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[0], openLoopOffset), DOG_CONT_g_walkDirection);
+					DOG_CONT_walkingGait_2(L_2, l2_start, DOG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[1], openLoopOffset), DOG_CONT_g_walkDirection);
+					DOG_CONT_walkingGait_1(L_3, l3_start, DOG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[2], openLoopOffset));
+					DOG_CONT_walkingGait_1(L_4, l4_start, DOG_CONT_g_walkDistance, percentage,    VECT_Add3D(LEG_CONT_g_walkStartOffsets[3], openLoopOffset));
 				}
 
 
 				time+=1;
-				if(time >= LEG_CONT_g_walkMaxTime){
+				if(time >= DOG_CONT_g_walkMaxTime){
 					time = 0;
 				}
 			}
@@ -1548,7 +1550,7 @@ void StartTask08(void *argument)
 	PSC_InitBuffers();
 	PSC_MSGQUEUE msg;
 
-	osStatus_t status;
+	//osStatus_t status;
 
 	int messageLen = 0;
 	//char[100] response;
@@ -1607,7 +1609,7 @@ void StartTask08(void *argument)
 				char response[] = "<laying>";
 				HAL_UART_Transmit_IT(&huart2, (uint8_t*)&response, sizeof(response));
 			}else if(PSC_InterpretCommand(msg.Buf, msg.Idx)){
-				char response[] = "<cmd recieved>";
+				//char response[] = "<cmd recieved>";
 				//HAL_UART_Transmit(&huart2, (uint8_t*)&startChar, 1, 1);
 				if(PSC_g_outputDataReady){
 					HAL_UART_Transmit_IT(&huart2, (uint8_t*)&PSC_OUTPUT_BUFFER, PSC_g_outputDataLen);

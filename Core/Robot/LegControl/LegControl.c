@@ -14,14 +14,12 @@
 //#include "main.h"
 //#include "../Inc/mutexs.h"
 
-#define PI 3.14159265358979323846
-#define RAD_TO_DEG 57.2958
-#define DEG_TO_RAD .0175
 
- float LEG_CONT_servoAngles[12]={};
- float LEG_CONT_servoOffsets[12]={};
- volatile float LEG_CONT_legPositions[4][3]={};
- volatile int LEG_CONT_movingForward=0;
+
+float LEG_CONT_servoAngles[12]={};
+float LEG_CONT_servoOffsets[12]={};
+volatile float LEG_CONT_legPositions[4][3]={};
+volatile int LEG_CONT_movingForward=0;
 
 extern  osMutexId_t servoAngleMutexHandle;
 void LEG_CONT_initServos(){
@@ -31,10 +29,10 @@ void LEG_CONT_initServos(){
 }
 
 float f(float x) {
-	return sqrt(pow(stepDist, 2) - x * x) -height;
+	return sqrt(pow(DOG_CONT_g_walkDistance, 2) - x * x) -DOG_CONT_g_walkHeight;
 }
 float g(float x) {
-	return sqrt(pow(stepDist, 2) - x * x) -height;
+	return sqrt(pow(DOG_CONT_g_walkDistance, 2) - x * x) -DOG_CONT_g_walkHeight;
 }
 float h(float x) {
 	return -10 * ((x + .3) * (x + .3)) - .85;
@@ -47,48 +45,14 @@ float semi_circle_step(float x, float distance, float height){
 //pos = -1.1
 //1/8 distance -> 0
 // 0*distance  = distance
-void LEG_CONT_walkingGait_1(LEG_CONT_Leg leg, float start, float distance, float percentage, VECT_3D offset){
-	float pos  = start - (percentage* distance);
-	if(pos <0){
-		pos += distance;
-	}
-	if(pos > distance /8){
-		LEG_CONT_setPosXYZ(leg, offset.x, pos + offset.y ,LEG_CONT_g_walkHeight);
-	}else if(pos <= distance/8 && pos>=0){
-		pos = 8* ((distance /8 )-pos);
-		LEG_CONT_setPosXYZ(leg, offset.x, pos + offset.y ,semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
-	}
-}
 
-void LEG_CONT_walkingGait_2(LEG_CONT_Leg leg, float start, float distance, float percentage, VECT_3D offset, float angle){
-	float pos  = start - (percentage* distance);
-	float posy = pos * cos(DEG_TO_RAD * angle);
-	float posx = pos * sin(DEG_TO_RAD * angle);
-	if(pos > distance /8){
-		LEG_CONT_setPosXYZ(leg,posx+ offset.x, posy + offset.y ,LEG_CONT_g_walkHeight);
-	}else if(pos <= distance/8 && pos>0){
-		pos = 8* ((distance /8 )-pos);
-		LEG_CONT_setPosXYZ(leg, posx +offset.x, posy + offset.y, semi_circle_step(pos,distance, LEG_CONT_g_walkHeight/2));
-	}else if(pos < 0){
-		LEG_CONT_setPosXYZ(leg,distance +posx+ offset.x, distance + posy + offset.y,LEG_CONT_g_walkHeight);
 
-	}
-}
 
-VECT_3D LEG_CONT_Point2Point(VECT_3D p1, VECT_3D p2, float percent){
-	VECT_3D pos;
-	float angle = atan2(p1.y-p2.y,p1.x-p2.x);
-	float distance = sqrt(pow(p1.x-p2.x,2) + pow(p1.y-p2.y, 2));
-	pos.y =( percent * distance * sin(angle))-p1.y;
-	pos.x = (percent* distance * cos(angle))-p1.x;
-	pos.z = 0;
-	return pos;
-}
 
 void LEG_CONT_singleStep_1(LEG_CONT_Leg leg, float angle, float distance) {
 	float y = distance * cos(DEG_TO_RAD * angle);
 	float x = distance * sin(DEG_TO_RAD * angle);
-	for (float i = -distance; i <= distance; i += step_) {
+	for (float i = -distance; i <= distance; i += LEG_CONT_g_step) {
 		LEG_CONT_setPosXYZ(leg, i * x, i * y, g(sqrt(pow(i * x, 2) + pow(i * y, 2))));
 	}
 }
@@ -97,7 +61,7 @@ void LEG_CONT_singleStep_1(LEG_CONT_Leg leg, float angle, float distance) {
 void LEG_CONT_singleStep_2(LEG_CONT_Leg leg, float angle, float stepDist) {
 	float y = stepDist * cos(DEG_TO_RAD * angle);
 	float x = stepDist * sin(DEG_TO_RAD * angle);
-	for (float i = -1; i < 1; i += step_) {
+	for (float i = -1; i < 1; i += LEG_CONT_g_step) {
 		LEG_CONT_setPosXYZ(leg, i * x, i * y, f(sqrt(pow(i * x, 2) + pow(i * y, 2))));
 	}
 }
@@ -106,7 +70,7 @@ void LEG_CONT_singleStep(LEG_CONT_Leg *leg, float angle, float distance) {
 	float y = distance * cos(DEG_TO_RAD * angle);
 	float x = distance * sin(DEG_TO_RAD * angle);
 	leg->isStepping = 1;
-	for (float i = -distance; i <= distance; i += step_) {
+	for (float i = -distance; i <= distance; i += LEG_CONT_g_step) {
 		LEG_CONT_setPosXYZ(*leg, (i * x)+(.5*!leg->isLeft)-(.5*leg->isLeft), (i * y)+(.2*leg->isFront)-(.2*!leg->isFront), g(sqrt(pow(i * x, 2) + pow(i * y, 2))));
 	}
 	leg->isStepping = 0;
@@ -117,7 +81,7 @@ void LEG_CONT_singleStepSimultaniusLegs(LEG_CONT_Leg *leg1, LEG_CONT_Leg *leg2, 
 	float x = distance * sin(DEG_TO_RAD * angle);
 	leg1->isStepping = 1;
 	leg2->isStepping = 1;
-	for (float i = -distance; i <= distance; i += step_) {
+	for (float i = -distance; i <= distance; i += LEG_CONT_g_step) {
 		LEG_CONT_setPosXYZ(*leg1, (i * x)+(.5*!leg1->isLeft)-(.5*leg1->isLeft), (i * y)+(.2*leg1->isFront)-(.2*!leg1->isFront), g(sqrt(pow(i * x, 2) + pow(i * y, 2))));
 
 		LEG_CONT_setPosXYZ(*leg2, (i * x)+(.5*!leg2->isLeft)-(.5*leg2->isLeft), (i * y)+(.2*leg2->isFront)-(.2*!leg2->isFront), g(sqrt(pow(i * x, 2) + pow(i * y, 2))));
@@ -136,19 +100,19 @@ void LEG_CONT_setPosXYZ(LEG_CONT_Leg leg, float x, float y, float z) {
 	float d = sqrt(x * x + z * z);
 	//float ta = atan(x / z) * (180.0 / PI);
 	if (leg.isLeft) {
-		tb = acos(HIP_OFFSET / d) *RAD_TO_DEG;
+		tb = acos(LEG_CONT_g_HIP_OFFSET / d) *RAD_TO_DEG;
 		ta = atan(x / z) * RAD_TO_DEG;
 		t1 = -90.0 - ta - tb;
 
 	} else {
-		tb = acos(-HIP_OFFSET / d) * RAD_TO_DEG;
+		tb = acos(-LEG_CONT_g_HIP_OFFSET / d) * RAD_TO_DEG;
 		ta = atan(x / z) * RAD_TO_DEG;
 		t1 = -90.0 - ta - tb;
 
 	}
 	//float t1 = -90.0 - ta - tb;
-	float x0 = HIP_OFFSET * (cos(t1 * DEG_TO_RAD));
-	float z0 = HIP_OFFSET * (sin(t1 * DEG_TO_RAD));
+	float x0 = LEG_CONT_g_HIP_OFFSET * (cos(t1 * DEG_TO_RAD));
+	float z0 = LEG_CONT_g_HIP_OFFSET * (sin(t1 * DEG_TO_RAD));
 	float D = sqrt((x0 - x) * (x0 - x) + (z0 - z) * (z0 - z));
 	//LEG_CONT_writeLegT1T2T3(leg, -t1-90, y, D);
 
@@ -173,19 +137,19 @@ void LEG_CONT_setPosXYZForOffset(LEG_CONT_Leg leg, float x, float y, float z, fl
 	float d = sqrt(x * x + z * z);
 	//float ta = atan(x / z) * (180.0 / PI);
 	if (leg.isLeft) {
-		tb = acos(HIP_OFFSET / d) *RAD_TO_DEG;
+		tb = acos(LEG_CONT_g_HIP_OFFSET / d) *RAD_TO_DEG;
 		ta = atan(x / z) * RAD_TO_DEG;
 		t1 = -90.0 - ta - tb;
 
 	} else {
-		tb = acos(-HIP_OFFSET / d) * RAD_TO_DEG;
+		tb = acos(-LEG_CONT_g_HIP_OFFSET / d) * RAD_TO_DEG;
 		ta = atan(x / z) * RAD_TO_DEG;
 		t1 = -90.0 - ta - tb;
 
 	}
 	//float t1 = -90.0 - ta - tb;
-	float x0 = HIP_OFFSET * (cos(t1 * DEG_TO_RAD));
-	float z0 = HIP_OFFSET * (sin(t1 * DEG_TO_RAD));
+	float x0 = LEG_CONT_g_HIP_OFFSET * (cos(t1 * DEG_TO_RAD));
+	float z0 = LEG_CONT_g_HIP_OFFSET * (sin(t1 * DEG_TO_RAD));
 	float D = sqrt((x0 - x) * (x0 - x) + (z0 - z) * (z0 - z));
 	//LEG_CONT_writeLegT1T2T3(leg, -t1-90, y, D);
 
@@ -211,8 +175,8 @@ void LEG_CONT_setPosYZ(LEG_CONT_Leg leg, float y, float z) {
 
 void LEG_CONT_setPosRT(LEG_CONT_Leg leg, float r, float t) {
 	float phi, q, l1, l2;
-	r = sqrt((4 * l * l) - (r * r));
-	phi = acos(1 - ((r * r) / (2 * l * l)))* RAD_TO_DEG;
+	r = sqrt((4 * LEG_CONT_g_legSegementLength * LEG_CONT_g_legSegementLength) - (r * r));
+	phi = acos(1 - ((r * r) / (2 * LEG_CONT_g_legSegementLength * LEG_CONT_g_legSegementLength)))* RAD_TO_DEG;
 	if (leg.isLeft) {
 		t=-t;
 		phi = phi;
@@ -313,19 +277,19 @@ void LEG_CONT_getOffsetsXYZ(LEG_CONT_Leg leg, float x, float y, float z) {
 	d = sqrt(x * x + z * z);
 	//float ta = atan(x / z) * (180.0 / PI);
 	if (leg.isLeft) {
-		tb = acos(HIP_OFFSET / d) *RAD_TO_DEG;
+		tb = acos(LEG_CONT_g_HIP_OFFSET / d) *RAD_TO_DEG;
 		ta = atan(x / z) * RAD_TO_DEG;
 		t1 = -90.0 - ta - tb;
 
 	} else {
-		tb = acos(-HIP_OFFSET / d) * RAD_TO_DEG;
+		tb = acos(-LEG_CONT_g_HIP_OFFSET / d) * RAD_TO_DEG;
 		ta = atan(x / z) * RAD_TO_DEG;
 		t1 = -90.0 - ta - tb;
 
 	}
 	//float t1 = -90.0 - ta - tb;
-	x0 = HIP_OFFSET * (cos(t1 * DEG_TO_RAD));
-	z0 = HIP_OFFSET * (sin(t1 * DEG_TO_RAD));
+	x0 = LEG_CONT_g_HIP_OFFSET * (cos(t1 * DEG_TO_RAD));
+	z0 = LEG_CONT_g_HIP_OFFSET * (sin(t1 * DEG_TO_RAD));
 	D = sqrt((x0 - x) * (x0 - x) + (z0 - z) * (z0 - z));
 	//LEG_CONT_writeLegT1T2T3(leg, -t1-90, y, D);
 
@@ -336,8 +300,8 @@ void LEG_CONT_getOffsetsXYZ(LEG_CONT_Leg leg, float x, float y, float z) {
 	}else{
 		t = atan(-y / z) * RAD_TO_DEG;
 	}
-	r = sqrt((4 * l * l) - (r * r));
-	phi = acos(1 - ((r * r) / (2 * l * l)))* RAD_TO_DEG;
+	r = sqrt((4 * LEG_CONT_g_legSegementLength * LEG_CONT_g_legSegementLength) - (r * r));
+	phi = acos(1 - ((r * r) / (2 * LEG_CONT_g_legSegementLength * LEG_CONT_g_legSegementLength)))* RAD_TO_DEG;
 	if (leg.isLeft) {
 		t=-t;
 		phi = phi;

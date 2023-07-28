@@ -13,24 +13,7 @@
 
 
 
-volatile float LEG_CONT_g_walkMaxTime = 10000;
-volatile float LEG_CONT_g_walkDistance = 1;
 
-volatile float LEG_CONT_g_walkOpenLoopOffsetX = .25;
-volatile float LEG_CONT_g_walkOpenLoopOffsetY = .5;
-volatile float LEG_CONT_g_walkHeight = 1.5;
-volatile float LEG_CONT_g_walkDirection = 0;
-
-//(+x,-y)->(-x,-y)
-//(-x,-y)->(-x,+y)
-//(-x,+y)->(+x,+y)
-//(+x,+y)->(+x,-y)
-volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset1 = { .4, -.0, 0};
-volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset2 = {-.4, -.0, 0};
-volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset3 = {-.4,  .5, 0};
-volatile VECT_3D LEG_CONT_g_walkOpenLoopOffset4 = { .4,  .5, 0};
-
-volatile  VECT_3D LEG_CONT_g_walkOpenLoopOffsets[4] = {};
 
 volatile VECT_3D LEG_CONT_g_walkStartOffset1 = { .75, -.75, 0};
 volatile VECT_3D LEG_CONT_g_walkStartOffset2 = {-.75, -.75, 0};
@@ -40,12 +23,11 @@ volatile VECT_3D LEG_CONT_g_walkStartOffset4 = { -.75,  0, 0};
 volatile  VECT_3D LEG_CONT_g_walkStartOffsets[4] = {};
 
 
-const float stepDist = .5;
-const float height = 1.5;
-const float step_ = .001;
-const float HIP_OFFSET = .28;
-const float angle = 0;
-const float l = 1;
+
+
+const float LEG_CONT_g_step = .001;
+const float LEG_CONT_g_HIP_OFFSET = .28;
+const float LEG_CONT_g_legSegementLength = 1;
 
 //set to 1 if system is using rtos and 0 if not
 
